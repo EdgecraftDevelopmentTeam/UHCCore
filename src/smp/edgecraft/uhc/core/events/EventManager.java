@@ -12,21 +12,21 @@ public class EventManager implements Listener {
     public void onPortalEnter(PlayerPortalEvent event) {
         switch (event.getCause()) {
             case END_PORTAL:
-                if (event.getFrom().getWorld() == UHCManager.currentUHCEnd) {
+                if (event.getFrom().getWorld() == UHCManager.WORLD_END) {
                     event.setTo(event.getPlayer().getBedSpawnLocation());
                 }
                 else {
-                    event.setTo(UHCManager.currentUHCEnd.getSpawnLocation());
+                    event.setTo(UHCManager.WORLD_END.getSpawnLocation());
                 }
                 break;
             case NETHER_PORTAL:
-                if (event.getFrom().getWorld() == UHCManager.currentUHCNether) {
-                    Location location = new Location(UHCManager.currentUHCOverworld, event.getPlayer().getLocation().getX() * 8, event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ() * 8);
+                if (event.getFrom().getWorld() == UHCManager.WORLD_NETHER) {
+                    Location location = new Location(UHCManager.WORLD_OVERWORLD, event.getPlayer().getLocation().getX() * 8, event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ() * 8);
                     event.getPortalTravelAgent().findOrCreate(location);
                     event.setTo(location);
                 }
                 else {
-                    Location location = new Location(UHCManager.currentUHCNether, event.getPlayer().getLocation().getX() / 8, event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ() / 8);
+                    Location location = new Location(UHCManager.WORLD_NETHER, event.getPlayer().getLocation().getX() / 8, event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ() / 8);
                     event.getPortalTravelAgent().findOrCreate(location);
                     event.setTo(location);
                 }

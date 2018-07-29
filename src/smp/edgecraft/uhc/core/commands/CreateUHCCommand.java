@@ -14,7 +14,7 @@ public class CreateUHCCommand extends GameCommand {
             player.sendMessage(ChatColor.RED + "Please specify a world name!");
         }
         else {
-            UHCManager.createUHC(args[0]);
+            UHCManager.createUHC("uhc/" + args[0]);
         }
     }
 }

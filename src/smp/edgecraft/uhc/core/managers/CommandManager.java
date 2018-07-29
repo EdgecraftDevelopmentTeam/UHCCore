@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.commands.CommandInfo;
 import smp.edgecraft.uhc.core.commands.CreateUHCCommand;
 import smp.edgecraft.uhc.core.commands.GameCommand;
+import smp.edgecraft.uhc.core.commands.SpectateUHCCommand;
 
 public class CommandManager implements CommandExecutor {
 
@@ -28,6 +29,7 @@ public class CommandManager implements CommandExecutor {
 		this.commands = new ArrayList<>();
 
 		this.commands.add(new CreateUHCCommand());
+		this.commands.add(new SpectateUHCCommand());
 	}
 
 	@Override

@@ -27,14 +27,14 @@ public class SettingsManager {
 	private FileConfiguration config;
 
 	protected SettingsManager(String fileName) {
-		if (!UHCCore.getPlugin().getDataFolder().exists()) {
+		if (!UHCCore.instance.getDataFolder().exists()) {
 			try {
-				UHCCore.getPlugin().getDataFolder().mkdir();
+				UHCCore.instance.getDataFolder().mkdir();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		this.file = new File(UHCCore.getPlugin().getDataFolder().getAbsolutePath() + "/" + fileName + ".yml");
+		this.file = new File(UHCCore.instance.getDataFolder().getAbsolutePath() + "/" + fileName + ".yml");
 
 		if (!this.file.exists()) {
 			try {

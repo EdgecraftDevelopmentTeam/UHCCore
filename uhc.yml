@@ -1,0 +1,9 @@
+spawn:
+  x: 0
+  y: 128
+  z: 0
+worldborder:
+  size: 10000
+  shrink:
+    duration: 72000
+    size: 100

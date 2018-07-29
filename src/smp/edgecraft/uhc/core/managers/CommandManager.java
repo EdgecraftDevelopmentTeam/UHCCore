@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.commands.CommandInfo;
+import smp.edgecraft.uhc.core.commands.CreateUHCCommand;
 import smp.edgecraft.uhc.core.commands.GameCommand;
 
 public class CommandManager implements CommandExecutor {
@@ -26,7 +27,7 @@ public class CommandManager implements CommandExecutor {
 	protected CommandManager() {
 		this.commands = new ArrayList<>();
 
-
+		this.commands.add(new CreateUHCCommand());
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			List<String> newArgs = new LinkedList<String>(Arrays.asList(args));
+			List<String> newArgs = new LinkedList<>(Arrays.asList(args));
 			newArgs.remove(0);
 			target.onCommand(player, newArgs.toArray(new String[0]));
 		}

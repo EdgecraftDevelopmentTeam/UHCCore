@@ -1,0 +1,8 @@
+main: smp.edgecraft.uhc.core.UHCCore
+name: UHCCore
+author: CJMinecraft
+version: 0.0.0.1
+commands:
+  uhc:
+    description: The main UHC command
+    usage: /uhc

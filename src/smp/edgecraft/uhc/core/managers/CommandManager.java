@@ -14,6 +14,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import smp.edgecraft.uhc.core.commands.CommandInfo;
+import smp.edgecraft.uhc.core.commands.GameCommand;
 
 public class CommandManager implements CommandExecutor {
 
@@ -24,8 +26,7 @@ public class CommandManager implements CommandExecutor {
 	protected CommandManager() {
 		this.commands = new ArrayList<>();
 
-		this.commands.add(new JoinGameCommand());
-		this.commands.add(new CreateGameCommand());
+
 	}
 
 	@Override
@@ -36,15 +37,11 @@ public class CommandManager implements CommandExecutor {
 		}
 
 		Player player = (Player) sender;
-		if (command.getName().equalsIgnoreCase("hub")) {
-			player.teleport(SettingsManager.getConfig("config").getLocation("hub"));
-		}
-
-		if (command.getName().equalsIgnoreCase("game")) {
+		if (command.getName().equalsIgnoreCase("uhc")) {
 			if (args.length == 0) {
 				for (GameCommand cmd : this.commands) {
 					CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
-					player.sendMessage(ChatColor.GOLD + "/game (" + StringUtils.join(info.aliases(), " ").trim()
+					player.sendMessage(ChatColor.GOLD + "/uhc (" + StringUtils.join(info.aliases(), " ").trim()
 							+ ") - " + info.description());
 				}
 
@@ -66,7 +63,7 @@ public class CommandManager implements CommandExecutor {
 			}
 
 			if (target == null) {
-				player.sendMessage(ChatColor.RED + "Could not find command: /game " + args[0]);
+				player.sendMessage(ChatColor.RED + "Could not find command: /uhc " + args[0]);
 				return true;
 			}
 

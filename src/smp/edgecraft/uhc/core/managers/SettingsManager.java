@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import smp.edgecraft.uhc.core.UHCCore;
 
 public class SettingsManager {
 
@@ -26,14 +27,14 @@ public class SettingsManager {
 	private FileConfiguration config;
 
 	protected SettingsManager(String fileName) {
-		if (!Main.getPlugin().getDataFolder().exists()) {
+		if (!UHCCore.getPlugin().getDataFolder().exists()) {
 			try {
-				Main.getPlugin().getDataFolder().mkdir();
+				UHCCore.getPlugin().getDataFolder().mkdir();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		this.file = new File(Main.getPlugin().getDataFolder().getAbsolutePath() + "/" + fileName + ".yml");
+		this.file = new File(UHCCore.getPlugin().getDataFolder().getAbsolutePath() + "/" + fileName + ".yml");
 
 		if (!this.file.exists()) {
 			try {

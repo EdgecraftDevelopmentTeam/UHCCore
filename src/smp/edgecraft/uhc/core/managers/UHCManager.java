@@ -39,7 +39,7 @@ public class UHCManager {
             }
 
             // Build lobby
-            for (int y2 = y; y2 < y + CONFIG.<Integer>get("lobby.height"); y2++) {
+            for (int y2 = y; y2 < y + CONFIG.<Integer>get("lobby.height") + 1; y2++) {
                 int z = (int) WORLD_OVERWORLD.getSpawnLocation().getZ() - CONFIG.<Integer>get("lobby.depth") / 2;
                 for (int x2 = (int) (WORLD_OVERWORLD.getSpawnLocation().getX() - CONFIG.<Integer>get("lobby.width") / 2); x2 < WORLD_OVERWORLD.getSpawnLocation().getX() + CONFIG.<Integer>get("lobby.width") / 2; x2++)
                     WORLD_OVERWORLD.getBlockAt(x2, y2, z).setType(Material.BARRIER);
@@ -53,6 +53,8 @@ public class UHCManager {
                 for (int z2 = (int) (WORLD_OVERWORLD.getSpawnLocation().getZ() - CONFIG.<Integer>get("lobby.depth") / 2); z2 < WORLD_OVERWORLD.getSpawnLocation().getZ() + CONFIG.<Integer>get("lobby.depth") / 2; z2++)
                     WORLD_OVERWORLD.getBlockAt(x, y2, z2).setType(Material.BARRIER);
             }
+
+            WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
         });
     }
 

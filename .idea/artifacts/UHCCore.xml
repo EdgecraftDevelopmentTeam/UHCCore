@@ -4,6 +4,7 @@
     <root id="archive" name="UHCCore.jar">
       <element id="module-output" name="UHCCore" />
       <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/uhc.yml" />
     </root>
   </artifact>
 </component>

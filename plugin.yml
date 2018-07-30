@@ -1,7 +1,7 @@
 main: smp.edgecraft.uhc.core.UHCCore
 name: UHCCore
 version: 0.0.0.1
-author: CJMinecraft
+author: CJMinecraft, ImJustIsabella, Prowdz, bkYT
 description: The core gameplay for a UHC
 api-version: 1.13
 commands:

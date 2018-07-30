@@ -1,28 +1,28 @@
-spawn:
-  x: 0
-  y: 64
-  z: 0
 worlds:
   overworld:
     name: world
     spawn:
       x: 0
-      y: 64
+      y: 175
       z: 0
   nether:
-  name: world_nether
-      spawn:
-        x: 0
-        y: 64
-        z: 0
+    name: world_nether
+    spawn:
+      x: 0
+      y: 64
+      z: 0
   end:
-  name: world_the_end
-      spawn:
-        x: 0
-        y: 64
-        z: 0
+    name: world_the_end
+    spawn:
+      x: 0
+      y: 64
+      z: 0
 worldborder:
   size: 10000
   shrink:
     duration: 72000
     size: 100
+lobby:
+  width: 50
+  depth: 50
+  height: 3

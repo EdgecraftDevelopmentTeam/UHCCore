@@ -66,8 +66,8 @@ public class SettingsManager {
 	}
 
 	public Location getLocation(String path, World world) {
-		return new Location(world, this.<Double>get(path + ".x"),
-				this.<Double>get(path + ".y"), this.<Double>get(path + ".z"),
+		return new Location(world, this.<Integer>get(path + ".x"),
+				this.<Integer>get(path + ".y"), this.<Integer>get(path + ".z"),
 				this.contains(path + ".rx") ? this.<Double>get(path + ".rx").floatValue() : 0.0F,
 				this.contains(path + ".rz") ? this.<Double>get(path + ".rz").floatValue() : 0.0F);
 	}

@@ -6,18 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.commands.CommandInfo;
-import smp.edgecraft.uhc.core.commands.CreateUHCCommand;
 import smp.edgecraft.uhc.core.commands.GameCommand;
-import smp.edgecraft.uhc.core.commands.SpectateUHCCommand;
+import smp.edgecraft.uhc.core.commands.PrepareCommand;
 
 public class CommandManager implements CommandExecutor {
 
@@ -28,8 +24,9 @@ public class CommandManager implements CommandExecutor {
 	protected CommandManager() {
 		this.commands = new ArrayList<>();
 
-		this.commands.add(new CreateUHCCommand());
-		this.commands.add(new SpectateUHCCommand());
+		// this.commands.add(new CreateUHCCommand()); TODO remove as not needed
+		// this.commands.add(new SpectateUHCCommand()); TODO finish
+		this.commands.add(new PrepareCommand());
 	}
 
 	@Override

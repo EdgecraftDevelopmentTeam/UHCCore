@@ -1,10 +1,14 @@
 package smp.edgecraft.uhc.core.managers;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -39,11 +43,20 @@ public class SettingsManager {
 		if (!this.file.exists()) {
 			try {
 				this.file.createNewFile();
+				InputStream input = UHCCore.instance.getResource("uhc.yml");
+				FileOutputStream output = new FileOutputStream(this.file.getAbsolutePath());
+				byte[] buf = new byte[1024];
+				int bytesRead;
+				while ((bytesRead = input.read(buf)) > 0) {
+					output.write(buf, 0, bytesRead);
+				}
+				// Load in default uhc.yml
+				input.close();
+				output.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
 		this.config = YamlConfiguration.loadConfiguration(this.file);
 	}
 
@@ -52,11 +65,15 @@ public class SettingsManager {
 		return (T) this.config.get(path);
 	}
 
-	public Location getLocation(String path) {
-		return new Location(Bukkit.getWorld(this.<String>get(path + ".world")), this.<Double>get(path + ".x"),
+	public Location getLocation(String path, World world) {
+		return new Location(world, this.<Double>get(path + ".x"),
 				this.<Double>get(path + ".y"), this.<Double>get(path + ".z"),
 				this.contains(path + ".rx") ? this.<Double>get(path + ".rx").floatValue() : 0.0F,
 				this.contains(path + ".rz") ? this.<Double>get(path + ".rz").floatValue() : 0.0F);
+	}
+
+	public Location getLocation(String path) {
+		return getLocation(path, Bukkit.getWorld(this.<String>get(path + ".world")));
 	}
 
 	public void set(String path, Object value) {

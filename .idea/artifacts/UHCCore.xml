@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="UHCCore">
+    <output-path>$PROJECT_DIR$/out/artifacts/UHCCore</output-path>
+    <root id="archive" name="UHCCore.jar">
+      <element id="module-output" name="UHCCore" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+    </root>
+  </artifact>
+</component>

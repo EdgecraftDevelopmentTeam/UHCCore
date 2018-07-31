@@ -25,7 +25,7 @@ public class CommandManager implements CommandExecutor {
 		this.commands = new ArrayList<>();
 
 		// this.commands.add(new CreateUHCCommand()); TODO remove as not needed
-		// this.commands.add(new SpectateUHCCommand()); TODO finish
+		// this.commands.add(new SpectateCommand()); TODO finish
 		this.commands.add(new PrepareCommand());
 	}
 

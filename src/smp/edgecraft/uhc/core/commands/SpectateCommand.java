@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 
 @CommandInfo(aliases = { "spectate" }, description = "Spectate the current uhc")
-public class SpectateUHCCommand extends GameCommand {
+public class SpectateCommand extends GameCommand {
 
     @Override
     public void onCommand(Player player, String[] args) {

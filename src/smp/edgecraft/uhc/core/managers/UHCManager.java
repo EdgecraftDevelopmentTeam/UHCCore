@@ -1,7 +1,6 @@
 package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
 import smp.edgecraft.uhc.core.UHCCore;
 
 public class UHCManager {

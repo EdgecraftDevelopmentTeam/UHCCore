@@ -30,6 +30,8 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setCenter(WORLD_END.getSpawnLocation());
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        announce(ChatColor.GREEN + "World borders created!");
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(UHCCore.instance, () -> {
             int y = (int) WORLD_OVERWORLD.getSpawnLocation().getY() - 1;
             for (int x = (int) (WORLD_OVERWORLD.getSpawnLocation().getX() - CONFIG.<Integer>get("lobby.width") / 2); x < WORLD_OVERWORLD.getSpawnLocation().getX() + CONFIG.<Integer>get("lobby.width") / 2; x++) {
@@ -54,7 +56,25 @@ public class UHCManager {
             }
 
             WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
+
+            announce(ChatColor.GREEN + "Lobby created!");
         });
+    }
+
+    public static void start() {
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
+    }
+
+    public static void announce(String message) {
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendMessage(message));
+        WORLD_NETHER.getPlayers().forEach(player -> player.sendMessage(message));
+        WORLD_END.getPlayers().forEach(player -> player.sendMessage(message));
+    }
+
+    public static void title(String message, String subtitle) {
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+        WORLD_NETHER.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+        WORLD_END.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
     }
 
     public enum GameStatus {

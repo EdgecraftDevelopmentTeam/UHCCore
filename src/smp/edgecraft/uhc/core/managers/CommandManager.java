@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.commands.CommandInfo;
 import smp.edgecraft.uhc.core.commands.GameCommand;
 import smp.edgecraft.uhc.core.commands.PrepareCommand;
+import smp.edgecraft.uhc.core.commands.StartCommand;
 
 public class CommandManager implements CommandExecutor {
 
@@ -27,6 +28,7 @@ public class CommandManager implements CommandExecutor {
 		// this.commands.add(new CreateUHCCommand()); TODO remove as not needed
 		// this.commands.add(new SpectateCommand()); TODO finish
 		this.commands.add(new PrepareCommand());
+		this.commands.add(new StartCommand());
 	}
 
 	@Override

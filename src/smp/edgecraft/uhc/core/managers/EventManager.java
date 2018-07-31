@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EventManager implements Listener {
 
@@ -17,6 +18,11 @@ public class EventManager implements Listener {
             player.setGameMode(GameMode.SPECTATOR);
             // TODO switch team
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (UHCManager.GAME_STATUS != UHCManager.GameStatus.RUNNING) event.getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
 }

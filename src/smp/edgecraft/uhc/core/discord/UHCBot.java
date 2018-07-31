@@ -18,6 +18,7 @@ public class UHCBot {
             jda = new JDABuilder(AccountType.BOT).setToken(UHCManager.CONFIG.get("discord.token")).buildBlocking();
             eventsServer = jda.getGuildById(UHCManager.CONFIG.get("guild"));
             jda.getPresence().setPresence(Game.of(Game.GameType.DEFAULT, "UUHC"), false);
+            jda.getPresence().setStatus(OnlineStatus.ONLINE);
             jda.setAutoReconnect(true);
         } catch (Exception e) {
             e.printStackTrace();

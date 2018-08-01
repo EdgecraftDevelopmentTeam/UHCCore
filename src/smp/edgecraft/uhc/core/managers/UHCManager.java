@@ -5,8 +5,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
+import smp.edgecraft.uhc.core.teams.UHCTeam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 public class UHCManager {
 
@@ -74,10 +78,31 @@ public class UHCManager {
     public static void prepareTeams()
     {
         PLAYERS = new ArrayList<>();
+        HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
+
+        int currentTeamOrdinal = -1;
 
         for (Player player : Bukkit.getOnlinePlayers())
         {
             PLAYERS.add(new UHCPlayer(player));
+            UHCTeam team = UHCTeam.values()[currentTeamOrdinal++ % UHCTeam.values().length];
+            if (!playersPerTeam.containsKey(team))
+                playersPerTeam.put(team, 0);
+            playersPerTeam.put(team, playersPerTeam.get(team) + 1);
+        }
+
+        ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
+
+        Random random = new Random();
+
+        for (int i = 0; i < PLAYERS.size(); i++) {
+            UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() - 1));
+            UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
+            while (playersPerTeam.get(team) <= 0)
+                team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
+            player.setTeam(team);
+            playersPerTeam.put(team, playersPerTeam.get(team) - 1);
+            unteamedPlayers.remove(player);
         }
     }
   

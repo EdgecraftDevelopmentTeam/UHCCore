@@ -61,7 +61,7 @@ public class TeamCommand extends GameCommand
                             + teamColor + displayTeamName + ChatColor.YELLOW + " team");
 
                     player.sendMessage(ChatColor.YELLOW + "Successfully put "
-                            + uhcPlayer.getPlayer().getDisplayName() + ChatColor.YELLOW + "into the "
+                            + uhcPlayer.getPlayer().getDisplayName() + ChatColor.YELLOW + " into the "
                             + teamColor + displayTeamName + ChatColor.YELLOW + " team");
                     return;
                 }

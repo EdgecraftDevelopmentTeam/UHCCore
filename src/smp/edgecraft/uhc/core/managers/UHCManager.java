@@ -3,10 +3,14 @@ package smp.edgecraft.uhc.core.managers;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 
 import java.util.ArrayList;
+
+import javax.swing.text.html.parser.Entity;
 
 public class UHCManager {
 
@@ -37,6 +41,11 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setCenter(WORLD_END.getSpawnLocation());
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "false");
+        WORLD_OVERWORLD.setTime(6000);
+
+        announce(ChatColor.GREEN + "World borders created!");
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(UHCCore.instance, () -> {
             int y = (int) WORLD_OVERWORLD.getSpawnLocation().getY() - 1;
             for (int x = (int) (WORLD_OVERWORLD.getSpawnLocation().getX() - CONFIG.<Integer>get("lobby.width") / 2); x < WORLD_OVERWORLD.getSpawnLocation().getX() + CONFIG.<Integer>get("lobby.width") / 2; x++) {
@@ -61,6 +70,8 @@ public class UHCManager {
             }
 
             WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
+
+            announce(ChatColor.GREEN + "Lobby created!");
         });
     }
 
@@ -72,6 +83,32 @@ public class UHCManager {
         {
             uhcPlayers.add(new UHCPlayer(player));
         }
+    }
+  
+    public static void start() {
+        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "true");
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
+
+        // Shrink border
+        WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
+        WORLD_NETHER.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
+        WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
+    }
+
+    public static boolean shouldBeDead(Player player, EntityDamageEvent event) {
+        return !(player.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING || player.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) && UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0;
+    }
+
+    public static void announce(String message) {
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendMessage(message));
+        WORLD_NETHER.getPlayers().forEach(player -> player.sendMessage(message));
+        WORLD_END.getPlayers().forEach(player -> player.sendMessage(message));
+    }
+
+    public static void title(String message, String subtitle) {
+        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+        WORLD_NETHER.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+        WORLD_END.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
     }
 
     public enum GameStatus {

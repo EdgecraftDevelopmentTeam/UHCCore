@@ -83,6 +83,8 @@ public class UHCManager {
         {
             uhcPlayers.add(new UHCPlayer(player));
         }
+
+        announce(ChatColor.GREEN + "Successfully created teams");
     }
   
     public static void start() {

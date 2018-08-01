@@ -75,7 +75,7 @@ public class UHCManager {
         });
     }
 
-    public void prepareTeams()
+    public static void prepareTeams()
     {
         uhcPlayers = new ArrayList<UHCPlayer>();
 

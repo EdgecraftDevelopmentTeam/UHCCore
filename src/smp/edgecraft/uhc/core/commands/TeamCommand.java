@@ -13,7 +13,7 @@ public class TeamCommand extends GameCommand
     public void onCommand(Player player, String[] args)
     {
         // uhc team <Team Name> <Player Name>
-        if (args[0].equals("team") && args.length == 3)
+        if (args.length == 2)
         {
             String teamName = args[1];
             String givenPlayerName = args[2];

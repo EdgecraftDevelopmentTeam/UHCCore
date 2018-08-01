@@ -2,11 +2,11 @@ package smp.edgecraft.uhc.core.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
+@CommandInfo(aliases = { "team" }, description = "Manually join a team")
 public class TeamCommand extends GameCommand
 {
     @Override
@@ -52,7 +52,7 @@ public class TeamCommand extends GameCommand
             String displayTeamName = teamName.substring(0,1).toUpperCase()
                     + teamName.substring(1, teamName.length());
 
-            for (UHCPlayer uhcPlayer : UHCManager.uhcPlayers)
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS)
             {
                 if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName))
                 {

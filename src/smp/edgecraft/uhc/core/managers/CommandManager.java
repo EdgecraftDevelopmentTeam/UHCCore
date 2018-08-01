@@ -11,10 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import smp.edgecraft.uhc.core.commands.CommandInfo;
-import smp.edgecraft.uhc.core.commands.GameCommand;
-import smp.edgecraft.uhc.core.commands.PrepareCommand;
-import smp.edgecraft.uhc.core.commands.StartCommand;
+import smp.edgecraft.uhc.core.commands.*;
 
 public class CommandManager implements CommandExecutor {
 
@@ -29,6 +26,7 @@ public class CommandManager implements CommandExecutor {
 		// this.commands.add(new SpectateCommand()); TODO finish
 		this.commands.add(new PrepareCommand());
 		this.commands.add(new StartCommand());
+		this.commands.add(new TeamCommand());
 	}
 
 	@Override

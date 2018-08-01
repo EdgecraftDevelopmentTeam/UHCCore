@@ -9,14 +9,7 @@ public class PrepareCommand extends GameCommand {
 
     @Override
     public void onCommand(Player player, String[] args) {
-        if (args.length != 1) {
-            player.sendMessage(ChatColor.RED + "Please choose whether to prepare the teams or the world");
-            return;
-        }
-
-        if (args[0].equalsIgnoreCase("world")) UHCManager.prepareWorld();
-        else if (args[0].equalsIgnoreCase("teams")) {
-
-        }
+        UHCManager.prepareWorld();
+        UHCManager.prepareTeams();
     }
 }

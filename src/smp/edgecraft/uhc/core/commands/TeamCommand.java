@@ -15,8 +15,8 @@ public class TeamCommand extends GameCommand
         // uhc team <Team Name> <Player Name>
         if (args.length == 2)
         {
-            String teamName = args[1];
-            String givenPlayerName = args[2];
+            String teamName = args[0];
+            String givenPlayerName = args[1];
             UHCTeam givenTeam = null;
             ChatColor teamColor = null;
 

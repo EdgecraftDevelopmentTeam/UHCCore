@@ -34,6 +34,9 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setCenter(WORLD_END.getSpawnLocation());
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "true");
+        WORLD_OVERWORLD.setTime(6000);
+
         announce(ChatColor.GREEN + "World borders created!");
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(UHCCore.instance, () -> {
@@ -66,7 +69,13 @@ public class UHCManager {
     }
 
     public static void start() {
+        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "false");
         WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
+
+        // Shrink border
+        WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
+        WORLD_NETHER.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
+        WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));
     }
 
     public static boolean shouldBeDead(Player player, EntityDamageEvent event) {

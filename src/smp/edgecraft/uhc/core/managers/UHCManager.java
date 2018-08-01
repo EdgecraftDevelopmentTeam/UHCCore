@@ -84,8 +84,10 @@ public class UHCManager {
 
         for (Player player : Bukkit.getOnlinePlayers())
         {
+            currentTeamOrdinal++;
+
             PLAYERS.add(new UHCPlayer(player));
-            UHCTeam team = UHCTeam.values()[currentTeamOrdinal++ % UHCTeam.values().length];
+            UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
             if (!playersPerTeam.containsKey(team))
                 playersPerTeam.put(team, 0);
             playersPerTeam.put(team, playersPerTeam.get(team) + 1);

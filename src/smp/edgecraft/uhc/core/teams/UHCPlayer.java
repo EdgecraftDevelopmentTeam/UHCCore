@@ -59,6 +59,9 @@ public class UHCPlayer
             default:
                 break;
         }
+
+        player.setDisplayName(teamColor + player.getName() + ChatColor.RESET);
+        player.setPlayerListName(teamColor + player.getName() + ChatColor.RESET);
     }
 
     public void setTeamColor(ChatColor teamColor)

@@ -104,6 +104,8 @@ public class UHCManager {
             playersPerTeam.put(team, playersPerTeam.get(team) - 1);
             unteamedPlayers.remove(player);
         }
+
+        announce(ChatColor.GREEN + "Successfully created teams");
     }
   
     public static void start() {

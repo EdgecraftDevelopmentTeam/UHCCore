@@ -8,6 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="spigot-1.13" level="project" />
-    <orderEntry type="library" name="DNBottyLibraries-1.6.0" level="project" />
+    <orderEntry type="library" name="JDA-3.7.1_385-withDependencies" level="project" />
   </component>
 </module>

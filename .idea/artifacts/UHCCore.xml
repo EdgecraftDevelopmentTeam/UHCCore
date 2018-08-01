@@ -5,6 +5,7 @@
       <element id="module-output" name="UHCCore" />
       <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
       <element id="file-copy" path="$PROJECT_DIR$/uhc.yml" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../JDA/JDA-3.7.1_385-withDependencies.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

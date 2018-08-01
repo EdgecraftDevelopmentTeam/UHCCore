@@ -15,8 +15,6 @@ public class PrepareCommand extends GameCommand {
         }
 
         if (args[0].equalsIgnoreCase("world")) UHCManager.prepareWorld();
-        else if (args[0].equalsIgnoreCase("teams")) {
-            UHCManager.prepareTeams();
-        }
+        else if (args[0].equalsIgnoreCase("teams")) UHCManager.prepareTeams();
     }
 }

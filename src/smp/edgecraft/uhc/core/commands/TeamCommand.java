@@ -2,21 +2,21 @@ package smp.edgecraft.uhc.core.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
+@CommandInfo(aliases = { "team" }, description = "Manually join a team")
 public class TeamCommand extends GameCommand
 {
     @Override
     public void onCommand(Player player, String[] args)
     {
         // uhc team <Team Name> <Player Name>
-        if (args[0].equals("team") && args.length == 3)
+        if (args.length == 2)
         {
-            String teamName = args[1];
-            String givenPlayerName = args[2];
+            String teamName = args[0];
+            String givenPlayerName = args[1];
             UHCTeam givenTeam = null;
             ChatColor teamColor = null;
 
@@ -52,7 +52,7 @@ public class TeamCommand extends GameCommand
             String displayTeamName = teamName.substring(0,1).toUpperCase()
                     + teamName.substring(1, teamName.length());
 
-            for (UHCPlayer uhcPlayer : UHCManager.uhcPlayers)
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS)
             {
                 if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName))
                 {
@@ -61,7 +61,7 @@ public class TeamCommand extends GameCommand
                             + teamColor + displayTeamName + ChatColor.YELLOW + " team");
 
                     player.sendMessage(ChatColor.YELLOW + "Successfully put "
-                            + uhcPlayer.getPlayer().getDisplayName() + ChatColor.YELLOW + "into the "
+                            + uhcPlayer.getPlayer().getDisplayName() + ChatColor.YELLOW + " into the "
                             + teamColor + displayTeamName + ChatColor.YELLOW + " team");
                     return;
                 }

@@ -26,3 +26,6 @@ lobby:
   width: 50
   depth: 50
   height: 3
+discord:
+  token: DISCORD_BOT_TOKEN
+  guild: SERVER_GUILD_ID

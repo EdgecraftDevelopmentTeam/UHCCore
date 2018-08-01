@@ -1,9 +1,14 @@
 package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import smp.edgecraft.uhc.core.UHCCore;
+import smp.edgecraft.uhc.core.teams.UHCPlayer;
+
+import java.util.ArrayList;
 
 import javax.swing.text.html.parser.Entity;
 
@@ -16,6 +21,8 @@ public class UHCManager {
     public static World WORLD_OVERWORLD;
     public static World WORLD_NETHER;
     public static World WORLD_END;
+
+    public static ArrayList<UHCPlayer> uhcPlayers;
 
     public static void prepareWorld() {
         WORLD_OVERWORLD = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.overworld.name"));
@@ -68,6 +75,16 @@ public class UHCManager {
         });
     }
 
+    public void prepareTeams()
+    {
+        uhcPlayers = new ArrayList<UHCPlayer>();
+
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            uhcPlayers.add(new UHCPlayer(player));
+        }
+    }
+  
     public static void start() {
         WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "true");
         WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));

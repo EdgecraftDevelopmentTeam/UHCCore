@@ -2,7 +2,11 @@ package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.UHCCore;
+import smp.edgecraft.uhc.core.teams.UHCPlayer;
+
+import java.util.ArrayList;
 
 public class UHCManager {
 
@@ -13,6 +17,8 @@ public class UHCManager {
     public static World WORLD_OVERWORLD;
     public static World WORLD_NETHER;
     public static World WORLD_END;
+
+    public static ArrayList<UHCPlayer> uhcPlayers;
 
     public static void prepareWorld() {
         WORLD_OVERWORLD = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.overworld.name"));
@@ -56,6 +62,16 @@ public class UHCManager {
 
             WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
         });
+    }
+
+    public void prepareTeams()
+    {
+        uhcPlayers = new ArrayList<UHCPlayer>();
+
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            uhcPlayers.add(new UHCPlayer(player));
+        }
     }
 
     public enum GameStatus {

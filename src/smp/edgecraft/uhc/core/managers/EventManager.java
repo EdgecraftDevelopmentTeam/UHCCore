@@ -14,15 +14,16 @@ public class EventManager implements Listener {
         if (!(event.getEntity() instanceof Player))
             return;
         Player player = (Player) event.getEntity();
-        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0) {
+        if (UHCManager.shouldBeDead(player, event)) {
             player.setGameMode(GameMode.SPECTATOR);
-            // TODO switch team
+            // TODO Switch teams
         }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (UHCManager.GAME_STATUS != UHCManager.GameStatus.RUNNING) event.getPlayer().setGameMode(GameMode.ADVENTURE);
+        else event.getPlayer().setGameMode(GameMode.SURVIVAL);
     }
 
 }

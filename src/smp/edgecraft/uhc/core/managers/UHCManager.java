@@ -1,7 +1,11 @@
 package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import smp.edgecraft.uhc.core.UHCCore;
+
+import javax.swing.text.html.parser.Entity;
 
 public class UHCManager {
 
@@ -63,6 +67,10 @@ public class UHCManager {
 
     public static void start() {
         WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
+    }
+
+    public static boolean shouldBeDead(Player player, EntityDamageEvent event) {
+        return !(player.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING || player.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) && UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0;
     }
 
     public static void announce(String message) {

@@ -21,7 +21,7 @@ public class UpdateCommand extends GameCommand {
         try {
             URL url = new URL(DOWNLOAD_URL);
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            FileOutputStream fos = new FileOutputStream(UHCCore.instance.getDataFolder().getParent() + "UHCCore.jar");
+            FileOutputStream fos = new FileOutputStream(UHCCore.instance.getDataFolder().getParent() + "/UHCCore.jar");
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
             rbc.close();

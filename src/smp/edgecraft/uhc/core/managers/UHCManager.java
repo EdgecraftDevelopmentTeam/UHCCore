@@ -29,7 +29,7 @@ public class UHCManager {
         WORLD_NETHER = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.nether.name"));
         WORLD_END = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.end.name"));
 
-        if (CONFIG.get("worlds.prepared"))
+        if (CONFIG.<Boolean>get("worlds.prepared"))
             return;
 
         WORLD_OVERWORLD.setSpawnLocation(CONFIG.getLocation("worlds.overworld.spawn", WORLD_OVERWORLD));
@@ -116,7 +116,7 @@ public class UHCManager {
 
             announce(ChatColor.GREEN + "Successfully created teams");
         } catch (Exception e) {
-            UHCManager.announce(ChatColor.RED + e.toString());
+            UHCManager.announce(e);
             e.printStackTrace();
         }
 
@@ -146,6 +146,12 @@ public class UHCManager {
         WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
         WORLD_NETHER.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
         WORLD_END.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+    }
+
+    public static void announce(Exception e) {
+        announce(ChatColor.RED + e.toString());
+        for (StackTraceElement element : e.getStackTrace())
+            announce(ChatColor.RED + element.toString());
     }
 
     public enum GameStatus {

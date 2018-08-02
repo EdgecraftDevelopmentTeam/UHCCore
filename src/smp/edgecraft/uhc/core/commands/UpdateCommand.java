@@ -29,7 +29,7 @@ public class UpdateCommand extends GameCommand {
             UHCManager.announce(ChatColor.GREEN + "Updated plugin!");
             Bukkit.reload();
         } catch (Exception e) {
-            UHCManager.announce(ChatColor.RED + e.toString());
+            UHCManager.announce(e);
             e.printStackTrace();
         }
     }

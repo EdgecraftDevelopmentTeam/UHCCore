@@ -1,5 +1,6 @@
 package smp.edgecraft.uhc.core.teams;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public enum UHCTeam
@@ -10,7 +11,7 @@ public enum UHCTeam
     GREEN,
     PINK;
 
-    private List<UHCPlayer> players;
+    private List<UHCPlayer> players = new ArrayList<>();
 
     public List<UHCPlayer> getPlayers() {
         return this.players;

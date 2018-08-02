@@ -86,6 +86,9 @@ public class UHCManager {
         try {
             HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
 
+            for (UHCTeam team : UHCTeam.values())
+                playersPerTeam.put(team, 0);
+
             int currentTeamOrdinal = -1;
 
             for (Player player : Bukkit.getOnlinePlayers())
@@ -94,8 +97,6 @@ public class UHCManager {
 
                 PLAYERS.add(new UHCPlayer(player));
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
-                if (!playersPerTeam.containsKey(team))
-                    playersPerTeam.put(team, 0);
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
             }
 

@@ -25,8 +25,9 @@ public class UpdateCommand extends GameCommand {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
             rbc.close();
-            Bukkit.reload();
+            UHCManager.prepareWorld();
             UHCManager.announce(ChatColor.GREEN + "Updated plugin!");
+            Bukkit.reload();
         } catch (Exception e) {
             UHCManager.announce(ChatColor.RED + e.toString());
             e.printStackTrace();

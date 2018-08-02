@@ -29,6 +29,9 @@ public class UHCManager {
         WORLD_NETHER = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.nether.name"));
         WORLD_END = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.end.name"));
 
+        if (CONFIG.get("worlds.prepared"))
+            return;
+
         WORLD_OVERWORLD.setSpawnLocation(CONFIG.getLocation("worlds.overworld.spawn", WORLD_OVERWORLD));
         WORLD_OVERWORLD.getWorldBorder().setCenter(WORLD_OVERWORLD.getSpawnLocation());
         WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
@@ -73,6 +76,8 @@ public class UHCManager {
 
             announce(ChatColor.GREEN + "Lobby created!");
         });
+
+        CONFIG.set("worlds.prepared", true);
     }
 
     public static void prepareTeams()

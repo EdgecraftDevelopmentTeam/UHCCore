@@ -124,7 +124,7 @@ public class UHCManager {
 
             CONFIG.set("teams.prepared", true);
 
-            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE && !member.getEffectiveName().equals("UHCCore")).forEach(member -> announce(member.getEffectiveName())/*member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue())*/);
+            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE && !member.getEffectiveName().equals("UHCCore")).forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue()));
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();

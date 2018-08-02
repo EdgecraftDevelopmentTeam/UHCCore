@@ -96,7 +96,7 @@ public class UHCManager {
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
                 if (!playersPerTeam.containsKey(team))
                     playersPerTeam.put(team, 0);
-                playersPerTeam.put(team, playersPerTeam.get(team) + 1);
+                playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
             }
 
             ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
@@ -106,11 +106,11 @@ public class UHCManager {
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() - 1));
                 UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
-                while (team.getPlayers().size() >= playersPerTeam.get(team))
+                while (team.getPlayers().size() >= playersPerTeam.get(team).intValue())
                     team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
                 player.setTeam(team);
                 team.getPlayers().add(player);
-                playersPerTeam.put(team, playersPerTeam.get(team) - 1);
+                playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
                 unteamedPlayers.remove(player);
             }
 

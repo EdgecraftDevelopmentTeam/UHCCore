@@ -1,5 +1,6 @@
 package smp.edgecraft.uhc.core.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.managers.UHCManager;
@@ -23,6 +24,7 @@ public class UpdateCommand extends GameCommand {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
             rbc.close();
+            Bukkit.reload();
         } catch (Exception e) {
             UHCManager.announce(e.toString());
             e.printStackTrace();

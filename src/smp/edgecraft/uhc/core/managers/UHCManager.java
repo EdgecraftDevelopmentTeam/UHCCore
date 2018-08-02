@@ -119,7 +119,7 @@ public class UHCManager {
 
             announce(ChatColor.GREEN + "Successfully created teams");
 
-            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE && member.getUser().getName() != "UHCCore").forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue()));
+            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE && member.getUser().getName() != "UHCCore#7195").forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue()));
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();

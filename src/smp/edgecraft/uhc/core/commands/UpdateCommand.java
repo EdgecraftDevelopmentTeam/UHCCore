@@ -1,6 +1,7 @@
 package smp.edgecraft.uhc.core.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.managers.UHCManager;
@@ -13,7 +14,7 @@ import java.nio.channels.ReadableByteChannel;
 @CommandInfo(aliases = { "update" }, description = "Update the plugin")
 public class UpdateCommand extends GameCommand {
 
-    public static final String DOWNLOAD_URL = "https://github.com/EdgecraftDevelopmentTeam/UHCCore/raw/master/out/artifacts/UHCCore/UHCCore.jar";
+    public static final String DOWNLOAD_URL = "https://github.com/EdgecraftDevelopmentTeam/UHCCore/blob/master/out/artifacts/UHCCore/UHCCore.jar?raw=true";
 
     @Override
     public void onCommand(Player player, String[] args) {
@@ -25,8 +26,9 @@ public class UpdateCommand extends GameCommand {
             fos.close();
             rbc.close();
             Bukkit.reload();
+            UHCManager.announce(ChatColor.GREEN + "Updated plugin!");
         } catch (Exception e) {
-            UHCManager.announce(e.toString());
+            UHCManager.announce(ChatColor.RED + e.toString());
             e.printStackTrace();
         }
     }

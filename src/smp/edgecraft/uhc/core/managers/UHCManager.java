@@ -111,7 +111,7 @@ public class UHCManager {
 
             announce(ChatColor.GREEN + "Successfully created teams");
         } catch (Exception e) {
-            UHCManager.announce(e.toString());
+            UHCManager.announce(ChatColor.RED + e.toString());
             e.printStackTrace();
         }
 

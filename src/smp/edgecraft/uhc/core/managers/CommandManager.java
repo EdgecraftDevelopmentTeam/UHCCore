@@ -27,6 +27,7 @@ public class CommandManager implements CommandExecutor {
 		this.commands.add(new PrepareCommand());
 		this.commands.add(new StartCommand());
 		this.commands.add(new TeamCommand());
+		this.commands.add(new UpdateCommand());
 	}
 
 	@Override

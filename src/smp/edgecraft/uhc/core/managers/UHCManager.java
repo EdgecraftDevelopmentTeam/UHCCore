@@ -107,8 +107,6 @@ public class UHCManager {
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
                 UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
-                announce(team.toString());
-                announce(playersPerTeam.get(team).toString());
                 while (team.getPlayers().size() >= playersPerTeam.get(team).intValue())
                     team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
                 player.setTeam(team);

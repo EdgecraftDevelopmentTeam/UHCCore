@@ -2,6 +2,7 @@ package smp.edgecraft.uhc.core.commands;
 
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.UHCCore;
+import smp.edgecraft.uhc.core.managers.UHCManager;
 
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -23,6 +24,7 @@ public class UpdateCommand extends GameCommand {
             fos.close();
             rbc.close();
         } catch (Exception e) {
+            UHCManager.announce(e.toString());
             e.printStackTrace();
         }
     }

@@ -78,36 +78,43 @@ public class UHCManager {
     public static void prepareTeams()
     {
         PLAYERS = new ArrayList<>();
-        HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
+        try {
+            HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
 
-        int currentTeamOrdinal = -1;
+            int currentTeamOrdinal = -1;
 
-        for (Player player : Bukkit.getOnlinePlayers())
-        {
-            currentTeamOrdinal++;
+            for (Player player : Bukkit.getOnlinePlayers())
+            {
+                currentTeamOrdinal++;
 
-            PLAYERS.add(new UHCPlayer(player));
-            UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
-            if (!playersPerTeam.containsKey(team))
-                playersPerTeam.put(team, 0);
-            playersPerTeam.put(team, playersPerTeam.get(team) + 1);
+                PLAYERS.add(new UHCPlayer(player));
+                UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
+                if (!playersPerTeam.containsKey(team))
+                    playersPerTeam.put(team, 0);
+                playersPerTeam.put(team, playersPerTeam.get(team) + 1);
+            }
+
+            ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
+
+            Random random = new Random();
+
+            for (int i = 0; i < PLAYERS.size(); i++) {
+                UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() - 1));
+                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
+                while (playersPerTeam.get(team) <= 0)
+                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
+                player.setTeam(team);
+                team.getPlayers().add(player);
+                playersPerTeam.put(team, playersPerTeam.get(team) - 1);
+                unteamedPlayers.remove(player);
+            }
+
+            announce(ChatColor.GREEN + "Successfully created teams");
+        } catch (Exception e) {
+            UHCManager.announce(e.toString());
+            e.printStackTrace();
         }
 
-        ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
-
-        Random random = new Random();
-
-        for (int i = 0; i < PLAYERS.size(); i++) {
-            UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() - 1));
-            UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
-            while (playersPerTeam.get(team) <= 0)
-                team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
-            player.setTeam(team);
-            playersPerTeam.put(team, playersPerTeam.get(team) - 1);
-            unteamedPlayers.remove(player);
-        }
-
-        announce(ChatColor.GREEN + "Successfully created teams");
     }
   
     public static void start() {

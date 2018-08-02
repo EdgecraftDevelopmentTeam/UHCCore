@@ -11,7 +11,11 @@ public enum UHCTeam
     GREEN,
     PINK;
 
-    private List<UHCPlayer> players = new ArrayList<>();
+    private List<UHCPlayer> players;
+
+    UHCTeam() {
+        this.players = new ArrayList<>();
+    }
 
     public List<UHCPlayer> getPlayers() {
         return this.players;

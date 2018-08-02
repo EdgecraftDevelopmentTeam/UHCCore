@@ -106,6 +106,7 @@ public class UHCManager {
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() - 1));
                 UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
+                announce(team.toString());
                 while (playersPerTeam.get(team) <= 0)
                     team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1)];
                 player.setTeam(team);
@@ -137,9 +138,7 @@ public class UHCManager {
     }
 
     public static void announce(String message) {
-        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendMessage(message));
-        WORLD_NETHER.getPlayers().forEach(player -> player.sendMessage(message));
-        WORLD_END.getPlayers().forEach(player -> player.sendMessage(message));
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(message));
     }
 
     public static void title(String message, String subtitle) {

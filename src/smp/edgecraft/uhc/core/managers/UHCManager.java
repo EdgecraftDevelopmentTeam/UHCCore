@@ -1,9 +1,11 @@
 package smp.edgecraft.uhc.core.managers;
 
+import net.dv8tion.jda.core.OnlineStatus;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import smp.edgecraft.uhc.core.UHCCore;
+import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
@@ -116,6 +118,8 @@ public class UHCManager {
             }
 
             announce(ChatColor.GREEN + "Successfully created teams");
+
+            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE).forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue()));
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();

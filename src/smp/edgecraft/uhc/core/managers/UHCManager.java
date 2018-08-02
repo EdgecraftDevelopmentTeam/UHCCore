@@ -105,12 +105,12 @@ public class UHCManager {
             Random random = new Random();
 
             for (int i = 0; i < PLAYERS.size(); i++) {
-                UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size() + 1));
-                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length + 1)];
+                UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
+                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
                 announce(team.toString());
                 announce(playersPerTeam.get(team).toString());
                 while (team.getPlayers().size() >= playersPerTeam.get(team).intValue())
-                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length + 1)];
+                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
                 player.setTeam(team);
                 team.getPlayers().add(player);
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);

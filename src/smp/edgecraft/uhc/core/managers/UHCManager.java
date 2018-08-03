@@ -107,8 +107,11 @@ public class UHCManager {
         try {
             HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
 
-
             int currentTeamOrdinal = 0;
+
+            for (UHCTeam team : UHCTeam.values())
+                if (team != UHCTeam.UNSET)
+                    playersPerTeam.put(team, 0);
 
             for (UHCPlayer player : PLAYERS)
             {
@@ -116,8 +119,6 @@ public class UHCManager {
                 if (currentTeamOrdinal > UHCTeam.values().length)
                     currentTeamOrdinal = 1;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
-                if (!playersPerTeam.containsKey(team))
-                    playersPerTeam.put(team, 0);
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
             }
 

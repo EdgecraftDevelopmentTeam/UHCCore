@@ -113,6 +113,28 @@ public class UHCManager {
                 if (team != UHCTeam.UNSET)
                     playersPerTeam.put(team, 0);
 
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                boolean found = false;
+                for (UHCPlayer uhcPlayer : PLAYERS) {
+                    if (uhcPlayer.getPlayer().equals(player)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    UHCPlayer uhcPlayer = new UHCPlayer(player);
+                    UHCManager.PLAYERS.add(uhcPlayer);
+
+                    if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
+                        UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
+                        uhcPlayer.setTeam(team);
+                    }
+                    if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
+                        uhcPlayer.link(UHCBot.jda.getUserById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
+                    }
+                }
+            }
+
             for (UHCPlayer player : PLAYERS)
             {
                 currentTeamOrdinal++;

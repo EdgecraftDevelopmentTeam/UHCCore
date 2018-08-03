@@ -116,7 +116,7 @@ public class UHCManager {
             for (UHCPlayer player : PLAYERS)
             {
                 currentTeamOrdinal++;
-                if (currentTeamOrdinal > UHCTeam.values().length)
+                if (currentTeamOrdinal >= UHCTeam.values().length)
                     currentTeamOrdinal = 1;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
@@ -135,7 +135,7 @@ public class UHCManager {
                 announce(team.name());
                 while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
                     currentTeamOrdinal++;
-                    if (currentTeamOrdinal > UHCTeam.values().length)
+                    if (currentTeamOrdinal >= UHCTeam.values().length)
                         currentTeamOrdinal = 1;
                     timesRan++;
                     team = UHCTeam.values()[currentTeamOrdinal];

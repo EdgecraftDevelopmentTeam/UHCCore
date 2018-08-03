@@ -20,6 +20,7 @@ worlds:
       z: 0
 teams:
   prepared: false
+
 worldborder:
   size: 10000
   shrink:

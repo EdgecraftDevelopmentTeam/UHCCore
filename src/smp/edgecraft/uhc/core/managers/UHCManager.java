@@ -97,9 +97,18 @@ public class UHCManager {
             {
                 currentTeamOrdinal++;
 
-                PLAYERS.add(new UHCPlayer(player));
-                UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
-                playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
+                UHCPlayer uhcPlayer = new UHCPlayer(player);
+                PLAYERS.add(uhcPlayer);
+
+                if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".team")) {
+                    UHCTeam team = UHCTeam.valueOf(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
+                    uhcPlayer.setTeam(team);
+                    playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
+                }
+                else {
+                    UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
+                    playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
+                }
             }
 
             ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
@@ -114,6 +123,7 @@ public class UHCManager {
                 player.setTeam(team);
                 team.getPlayers().add(player);
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
+                CONFIG.set("teams.players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());
                 unteamedPlayers.remove(player);
             }
 
@@ -123,8 +133,6 @@ public class UHCManager {
                 return;
 
             CONFIG.set("teams.prepared", true);
-
-            UHCBot.eventsServer.getMembers().stream().filter(member -> member.getOnlineStatus() != OnlineStatus.OFFLINE && !member.getEffectiveName().equals("UHCCore")).forEach(member -> member.getUser().openPrivateChannel().queue(channel -> channel.sendMessage("This is a test message, please ignore").queue()));
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();

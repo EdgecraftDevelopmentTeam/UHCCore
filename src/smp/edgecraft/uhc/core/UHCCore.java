@@ -16,8 +16,8 @@ public class UHCCore extends JavaPlugin {
         this.getCommand("uhc").setExecutor(CommandManager.INSTANCE);
         this.getServer().getPluginManager().registerEvents(new EventManager(), this);
         UHCManager.CONFIG.getConfig();
-        UHCManager.prepareWorld();
         UHCBot.onEnable();
+        UHCManager.onEnable();
     }
 
     @Override

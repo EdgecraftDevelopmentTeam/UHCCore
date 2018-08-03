@@ -26,6 +26,24 @@ public class UHCManager {
 
     public static ArrayList<UHCPlayer> PLAYERS;
 
+    public static void onEnable() {
+        prepareWorld();
+        PLAYERS = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers())
+        {
+            UHCPlayer uhcPlayer = new UHCPlayer(player);
+            PLAYERS.add(uhcPlayer);
+
+            if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".team")) {
+                UHCTeam team = UHCTeam.valueOf(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
+                uhcPlayer.setTeam(team);
+            }
+            if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".discord")) {
+                uhcPlayer.link(UHCBot.jda.getUserById(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".discord")));
+            }
+        }
+    }
+
     public static void prepareWorld() {
         WORLD_OVERWORLD = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.overworld.name"));
         WORLD_NETHER = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.nether.name"));
@@ -109,6 +127,10 @@ public class UHCManager {
                     UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
                     playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
                 }
+
+                if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".discord")) {
+                    uhcPlayer.link(UHCBot.jda.getUserById(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".discord")));
+                }
             }
 
             ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
@@ -128,11 +150,6 @@ public class UHCManager {
             }
 
             announce(ChatColor.GREEN + "Successfully created teams");
-
-            if (CONFIG.<Boolean>get("teams.prepared"))
-                return;
-
-            CONFIG.set("teams.prepared", true);
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();

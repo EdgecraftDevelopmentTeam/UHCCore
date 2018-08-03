@@ -18,9 +18,6 @@ worlds:
       x: 0
       y: 64
       z: 0
-teams:
-  prepared: false
-
 worldborder:
   size: 10000
   shrink:

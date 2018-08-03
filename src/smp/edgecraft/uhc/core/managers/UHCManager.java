@@ -131,6 +131,7 @@ public class UHCManager {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
                 int timesRan = 0;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
+                announce(team.name());
                 while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
                     currentTeamOrdinal++;
                     if (currentTeamOrdinal > UHCTeam.values().length)

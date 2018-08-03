@@ -4,6 +4,7 @@ import net.dv8tion.jda.core.OnlineStatus;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
@@ -107,7 +108,7 @@ public class UHCManager {
             HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
 
 
-            int currentTeamOrdinal = -1;
+            int currentTeamOrdinal = 0;
 
             for (UHCPlayer player : PLAYERS)
             {
@@ -128,9 +129,8 @@ public class UHCManager {
 
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
-                currentTeamOrdinal++;
                 int timesRan = 0;
-                UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
                 while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
                     currentTeamOrdinal++;
                     if (currentTeamOrdinal > UHCTeam.values().length)
@@ -156,7 +156,11 @@ public class UHCManager {
   
     public static void start() {
         WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "true");
-        WORLD_OVERWORLD.getPlayers().forEach(player -> player.setGameMode(GameMode.SURVIVAL));
+        WORLD_OVERWORLD.getPlayers().forEach(player -> {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.removePotionEffect(PotionEffectType.SATURATION);
+        });
+        // GAME_STATUS = GameStatus.RUNNING; TODO switch game status
 
         // Shrink border
         WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Long>get("worldborder.shrink.duration"));

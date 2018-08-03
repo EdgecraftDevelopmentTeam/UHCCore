@@ -115,35 +115,26 @@ public class UHCManager {
             for (UHCPlayer player : PLAYERS)
             {
                 currentTeamOrdinal++;
-                if (CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".team")) {
-                    UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".team"));
-                    if (team == UHCTeam.UNSET) {
-                        team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
-                        playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
-                    }
-                    else {
-                        playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
-                        currentTeamOrdinal--;
-                    }
-                }
-                else {
-                    UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
-                    playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
-                }
+                UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
             }
 
             ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
 
             Random random = new Random();
 
+            currentTeamOrdinal = -1;
+
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
-                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1) + 1];
-                while (team.getPlayers().size() >= playersPerTeam.get(team).intValue())
-                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1) + 1];
+                currentTeamOrdinal++;
+                UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
+                    currentTeamOrdinal++;
+                    team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                }
                 player.setTeam(team);
                 team.getPlayers().add(player);
-                playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
                 CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());
                 unteamedPlayers.remove(player);
             }

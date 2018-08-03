@@ -140,6 +140,8 @@ public class UHCManager {
                     if (timesRan == UHCTeam.values().length - 1)
                         break;
                 }
+                if (currentTeamOrdinal > UHCTeam.values().length)
+                    currentTeamOrdinal = 1;
                 player.setTeam(team);
                 team.getPlayers().add(player);
                 CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());

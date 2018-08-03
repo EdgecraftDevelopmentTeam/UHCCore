@@ -29,17 +29,18 @@ public class UHCManager {
     public static void onEnable() {
         prepareWorld();
         PLAYERS = new ArrayList<>();
+
         for (Player player : Bukkit.getOnlinePlayers())
         {
             UHCPlayer uhcPlayer = new UHCPlayer(player);
-            PLAYERS.add(uhcPlayer);
+            UHCManager.PLAYERS.add(uhcPlayer);
 
-            if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".team")) {
-                UHCTeam team = UHCTeam.valueOf(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
+            if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
+                UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
                 uhcPlayer.setTeam(team);
             }
-            if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".discord")) {
-                uhcPlayer.link(UHCBot.jda.getUserById(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".discord")));
+            if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
+                uhcPlayer.link(UHCBot.jda.getUserById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
             }
         }
     }
@@ -102,34 +103,32 @@ public class UHCManager {
 
     public static void prepareTeams()
     {
-        PLAYERS = new ArrayList<>();
         try {
             HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
 
             for (UHCTeam team : UHCTeam.values())
-                playersPerTeam.put(team, 0);
+                if (team != UHCTeam.UNSET)
+                    playersPerTeam.put(team, 0);
 
             int currentTeamOrdinal = -1;
 
-            for (Player player : Bukkit.getOnlinePlayers())
+            for (UHCPlayer player : PLAYERS)
             {
                 currentTeamOrdinal++;
-
-                UHCPlayer uhcPlayer = new UHCPlayer(player);
-                PLAYERS.add(uhcPlayer);
-
-                if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".team")) {
-                    UHCTeam team = UHCTeam.valueOf(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
-                    uhcPlayer.setTeam(team);
-                    playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
+                if (CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".team")) {
+                    UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".team"));
+                    if (team == UHCTeam.UNSET) {
+                        team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                        playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
+                    }
+                    else {
+                        playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
+                        currentTeamOrdinal--;
+                    }
                 }
                 else {
-                    UHCTeam team = UHCTeam.values()[currentTeamOrdinal % UHCTeam.values().length];
+                    UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
                     playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
-                }
-
-                if (CONFIG.contains("teams.players." + player.getUniqueId().toString() + ".discord")) {
-                    uhcPlayer.link(UHCBot.jda.getUserById(CONFIG.get("teams.players." + player.getUniqueId().toString() + ".discord")));
                 }
             }
 
@@ -139,13 +138,13 @@ public class UHCManager {
 
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
-                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
+                UHCTeam team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1) + 1];
                 while (team.getPlayers().size() >= playersPerTeam.get(team).intValue())
-                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length)];
+                    team = UHCTeam.values()[random.nextInt(UHCTeam.values().length - 1) + 1];
                 player.setTeam(team);
                 team.getPlayers().add(player);
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() - 1);
-                CONFIG.set("teams.players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());
+                CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());
                 unteamedPlayers.remove(player);
             }
 

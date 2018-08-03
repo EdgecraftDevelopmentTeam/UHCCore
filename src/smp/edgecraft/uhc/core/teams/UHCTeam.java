@@ -5,6 +5,7 @@ import java.util.List;
 
 public enum UHCTeam
 {
+    UNSET,
     BLUE,
     RED,
     YELLOW,

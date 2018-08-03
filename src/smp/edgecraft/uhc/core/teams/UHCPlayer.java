@@ -67,6 +67,7 @@ public class UHCPlayer
                 teamColor = ChatColor.LIGHT_PURPLE;
                 break;
             default:
+                teamColor = ChatColor.WHITE;
                 break;
         }
 

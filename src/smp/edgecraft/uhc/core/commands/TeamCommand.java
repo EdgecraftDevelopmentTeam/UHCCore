@@ -13,6 +13,7 @@ public class TeamCommand extends GameCommand
     public void onCommand(Player player, String[] args)
     {
         // uhc team <Team Name> <Player Name>
+        // or uhc team reset
         if (args.length == 2)
         {
             String teamName = args[0];
@@ -70,6 +71,13 @@ public class TeamCommand extends GameCommand
             // If the provided player name is not found:
             player.sendMessage(ChatColor.RED + "Invalid player name");
             return;
+        }
+        else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
+                uhcPlayer.setTeam(UHCTeam.UNSET);
+                UHCManager.CONFIG.set("players." + uhcPlayer.getPlayer().getUniqueId().toString() + ".team", UHCTeam.UNSET.name());
+            }
+            player.sendMessage(ChatColor.GREEN + "Reset teams!");
         }
     }
 }

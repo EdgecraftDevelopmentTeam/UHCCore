@@ -125,7 +125,7 @@ public class UHCManager {
 
             Random random = new Random();
 
-            currentTeamOrdinal = 0;
+            currentTeamOrdinal = 1;
 
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));

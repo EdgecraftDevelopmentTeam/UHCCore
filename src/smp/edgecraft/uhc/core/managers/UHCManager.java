@@ -130,6 +130,7 @@ public class UHCManager {
 
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
+                announce(player.getPlayer().getDisplayName());
                 int timesRan = 0;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
                 announce(team.name());

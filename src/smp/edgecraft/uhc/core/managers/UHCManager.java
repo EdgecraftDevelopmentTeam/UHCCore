@@ -115,7 +115,9 @@ public class UHCManager {
             for (UHCPlayer player : PLAYERS)
             {
                 currentTeamOrdinal++;
-                UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                if (currentTeamOrdinal > UHCTeam.values().length)
+                    currentTeamOrdinal = 1;
+                UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
                 playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
             }
 
@@ -123,15 +125,21 @@ public class UHCManager {
 
             Random random = new Random();
 
-            currentTeamOrdinal = -1;
+            currentTeamOrdinal = 0;
 
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
                 currentTeamOrdinal++;
+                int timesRan = 0;
                 UHCTeam team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
                 while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
                     currentTeamOrdinal++;
-                    team = UHCTeam.values()[(currentTeamOrdinal % UHCTeam.values().length) + 1];
+                    if (currentTeamOrdinal > UHCTeam.values().length)
+                        currentTeamOrdinal = 1;
+                    timesRan++;
+                    team = UHCTeam.values()[currentTeamOrdinal];
+                    if (timesRan == UHCTeam.values().length - 1)
+                        break;
                 }
                 player.setTeam(team);
                 team.getPlayers().add(player);

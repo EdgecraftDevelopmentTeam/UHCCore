@@ -22,7 +22,17 @@ public class EventManager implements Listener {
         Player player = (Player) event.getEntity();
         if (UHCManager.shouldBeDead(player, event)) {
             player.setGameMode(GameMode.SPECTATOR);
-            // TODO Switch teams
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
+                if (uhcPlayer.getPlayer().equals(player)) {
+                    uhcPlayer.setTeam(UHCTeam.UNSET);
+                    if (uhcPlayer.getDiscordMember() != null) {
+                        UHCBot.movePlayerToMainVC(uhcPlayer);
+                        break;
+                    }
+                }
+            }
+
+            // TODO Check win
         }
     }
 
@@ -46,7 +56,7 @@ public class EventManager implements Listener {
             player.setTeam(team);
         }
         if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".discord")) {
-            player.link(UHCBot.jda.getUserById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
+            player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
         }
     }
 

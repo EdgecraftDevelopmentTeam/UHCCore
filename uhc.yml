@@ -30,3 +30,10 @@ lobby:
 discord:
   token: DISCORD_BOT_TOKEN
   guild: SERVER_GUILD_ID
+  vcs:
+    main: MAIN_VC_ID
+    blue: BLUE_VC_ID
+    red: RED_VC_ID
+    yellow: YELLOW_VC_ID
+    green: GREEN_VC_ID
+    pink: PINK_VC_ID

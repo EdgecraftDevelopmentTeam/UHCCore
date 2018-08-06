@@ -1,5 +1,6 @@
 package smp.edgecraft.uhc.core.teams;
 
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ public class UHCPlayer
     private Player player;
     private UHCTeam team;
     private ChatColor teamColor;
-    private User discordUser;
+    private Member discordMember;
 
     public UHCPlayer(Player player)
     {
@@ -23,12 +24,12 @@ public class UHCPlayer
         setRespectiveColor();
     }
 
-    public void link(User user) {
-        this.discordUser = user;
+    public void link(Member member) {
+        this.discordMember = member;
     }
 
-    public User getDiscordUser() {
-        return discordUser;
+    public Member getDiscordMember() {
+        return this.discordMember;
     }
 
     public void setTeam(UHCTeam team)

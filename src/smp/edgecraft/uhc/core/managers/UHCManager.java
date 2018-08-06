@@ -1,6 +1,5 @@
 package smp.edgecraft.uhc.core.managers;
 
-import net.dv8tion.jda.core.OnlineStatus;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -12,7 +11,6 @@ import smp.edgecraft.uhc.core.teams.UHCTeam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 public class UHCManager {
@@ -41,7 +39,7 @@ public class UHCManager {
                 uhcPlayer.setTeam(team);
             }
             if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
-                uhcPlayer.link(UHCBot.jda.getUserById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
+                uhcPlayer.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
             }
         }
     }
@@ -130,7 +128,7 @@ public class UHCManager {
                         uhcPlayer.setTeam(team);
                     }
                     if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
-                        uhcPlayer.link(UHCBot.jda.getUserById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
+                        uhcPlayer.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
                     }
                 }
             }
@@ -150,14 +148,10 @@ public class UHCManager {
 
             currentTeamOrdinal = 1;
 
-            announce(PLAYERS.size() + "");
-
             for (int i = 0; i < PLAYERS.size(); i++) {
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
-                announce(player.getPlayer().getDisplayName());
                 int timesRan = 0;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
-                announce(team.name());
                 while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
                     currentTeamOrdinal++;
                     if (currentTeamOrdinal >= UHCTeam.values().length)
@@ -195,6 +189,8 @@ public class UHCManager {
         WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
         WORLD_NETHER.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
+
+        UHCBot.movePlayersInVC();
     }
 
     public static boolean shouldBeDead(Player player, EntityDamageEvent event) {

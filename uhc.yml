@@ -27,6 +27,39 @@ lobby:
   width: 50
   depth: 50
   height: 3
+spawns:
+  1:
+    x: 2500
+    y: 64
+    z: 0
+  2:
+    x: 2500
+    y: 64
+    z: 2500
+  3:
+    x: 0
+    y: 64
+    z: 2500
+  4:
+    x: -2500
+    y: 64
+    z: 2500
+  5:
+    x: -2500
+    y: 64
+    z: 0
+  6:
+    x: -2500
+    y: 64
+    z: -2500
+  7:
+    x: 0
+    y: 64
+    z: -2500
+  8:
+    x: 2500
+    y: 64
+    z: -2500
 discord:
   token: DISCORD_BOT_TOKEN
   guild: SERVER_GUILD_ID

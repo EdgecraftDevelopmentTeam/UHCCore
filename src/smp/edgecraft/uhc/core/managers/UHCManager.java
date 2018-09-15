@@ -24,10 +24,12 @@ public class UHCManager {
     public static World WORLD_END;
 
     public static ArrayList<UHCPlayer> PLAYERS;
+    public static ArrayList<UHCTeam> TEAMS;
 
     public static void onEnable() {
         prepareWorld();
         PLAYERS = new ArrayList<>();
+        TEAMS = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers())
         {
@@ -169,6 +171,10 @@ public class UHCManager {
                 unteamedPlayers.remove(player);
             }
 
+            for (UHCTeam team : UHCTeam.values())
+                if (team.isActive())
+                    TEAMS.add(team);
+
             announce(ChatColor.GREEN + "Successfully created teams");
         } catch (Exception e) {
             UHCManager.announce(e);
@@ -191,6 +197,18 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
 
         UHCBot.movePlayersInVC();
+
+        ArrayList<Integer> chosenIndicies = new ArrayList<>();
+        Random random = new Random();
+        for (UHCTeam team : TEAMS) {
+            int index = random.nextInt(8) + 1;
+            while (chosenIndicies.contains(index))
+                index = random.nextInt(8) + 1;
+            Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
+            location.setPitch(-90F);
+            team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
+            // Begin animation of dropping
+        }
     }
 
     public static boolean shouldBeDead(Player player, EntityDamageEvent event) {

@@ -25,4 +25,8 @@ public enum UHCTeam
     public void setPlayers(List<UHCPlayer> players) {
         this.players = players;
     }
+
+    public boolean isActive() {
+        return this.players.size() > 0;
+    }
 }

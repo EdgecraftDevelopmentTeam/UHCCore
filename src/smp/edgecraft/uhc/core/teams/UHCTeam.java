@@ -69,7 +69,8 @@ public enum UHCTeam {
      */
     public UHCTeam removePlayer(UHCPlayer player) {
         if (this.players.contains(player)) {
-            UNSET.addPlayer(player);
+            if (this != UNSET)
+                UNSET.addPlayer(player);
             this.players.remove(player);
         }
         return this;

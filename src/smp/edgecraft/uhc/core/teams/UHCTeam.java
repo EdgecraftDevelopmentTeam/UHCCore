@@ -11,7 +11,7 @@ import java.util.List;
  */
 public enum UHCTeam {
     UNSET(ChatColor.GRAY), // The default team of every player
-    BLUE(ChatColor.GREEN),
+    BLUE(ChatColor.BLUE),
     RED(ChatColor.RED),
     YELLOW(ChatColor.YELLOW),
     GREEN(ChatColor.GREEN),

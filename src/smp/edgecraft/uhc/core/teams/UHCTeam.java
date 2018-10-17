@@ -1,6 +1,7 @@
 package smp.edgecraft.uhc.core.teams;
 
 import org.bukkit.ChatColor;
+import smp.edgecraft.uhc.core.managers.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.List;

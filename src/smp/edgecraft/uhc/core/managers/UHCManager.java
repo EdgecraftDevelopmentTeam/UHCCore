@@ -37,7 +37,7 @@ public class UHCManager {
             UHCManager.PLAYERS.add(uhcPlayer);
 
             if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
-                UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
+                UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".team"));
                 uhcPlayer.setTeam(team);
             }
             if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {

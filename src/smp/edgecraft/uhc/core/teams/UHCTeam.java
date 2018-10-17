@@ -53,6 +53,8 @@ public enum UHCTeam {
      * @return The updated team
      */
     public UHCTeam addPlayer(UHCPlayer player) {
+        if (UNSET.getPlayers().contains(player))
+            UNSET.removePlayer(player);
         player.getPlayer().setDisplayName(this.teamColor + player.getPlayer().getDisplayName() + ChatColor.RESET);
         player.getPlayer().setPlayerListName(this.teamColor + player.getPlayer().getDisplayName() + ChatColor.RESET);
         this.players.add(player);

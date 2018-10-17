@@ -4,7 +4,10 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 
-@CommandInfo(aliases = { "spectate" }, description = "Spectate the current uhc")
+/**
+ * The spectate command: states the user wishes to spectate the UHC. TODO FINISH
+ */
+@CommandInfo(aliases = {"spectate"}, description = "Spectate the current uhc")
 public class SpectateCommand extends GameCommand {
 
     @Override

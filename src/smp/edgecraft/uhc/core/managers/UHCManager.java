@@ -66,7 +66,7 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setCenter(WORLD_END.getSpawnLocation());
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
-        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "false");
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         WORLD_OVERWORLD.setTime(0);
 
         announce(ChatColor.GREEN + "World borders created!");
@@ -184,7 +184,9 @@ public class UHCManager {
     }
   
     public static void start() {
-        WORLD_OVERWORLD.setGameRuleValue("doDaylightCycle", "true");
+        // Countdown
+
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
         WORLD_OVERWORLD.getPlayers().forEach(player -> {
             player.setGameMode(GameMode.SURVIVAL);
             player.removePotionEffect(PotionEffectType.SATURATION);

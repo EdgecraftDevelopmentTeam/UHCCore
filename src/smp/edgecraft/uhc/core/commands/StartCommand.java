@@ -4,7 +4,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 
-@CommandInfo(aliases = { "start" }, description = "Starts the UHC")
+/**
+ * The start command: starts the UHC match!
+ */
+@CommandInfo(aliases = {"start"}, description = "Starts the UHC")
 public class StartCommand extends GameCommand {
 
     @Override

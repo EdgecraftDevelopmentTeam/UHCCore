@@ -6,16 +6,16 @@ import smp.edgecraft.uhc.core.managers.UHCManager;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
-@CommandInfo(aliases = { "team" }, description = "Manually join a team")
-public class TeamCommand extends GameCommand
-{
+/**
+ * Manually puts a player onto a specific team
+ */
+@CommandInfo(aliases = {"team"}, description = "Manually join a team")
+public class TeamCommand extends GameCommand {
     @Override
-    public void onCommand(Player player, String[] args)
-    {
+    public void onCommand(Player player, String[] args) {
         // uhc team <Team Name> <Player Name>
         // or uhc team reset
-        if (args.length == 2)
-        {
+        if (args.length == 2) {
             String teamName = args[0];
             String givenPlayerName = args[1];
             UHCTeam givenTeam = null;
@@ -23,8 +23,7 @@ public class TeamCommand extends GameCommand
 
             teamName = teamName.toLowerCase();
 
-            switch (teamName)
-            {
+            switch (teamName) {
                 case "blue":
                     givenTeam = UHCTeam.BLUE;
                     teamColor = ChatColor.BLUE;
@@ -50,15 +49,13 @@ public class TeamCommand extends GameCommand
                     return;
             }
 
-            String displayTeamName = teamName.substring(0,1).toUpperCase()
+            String displayTeamName = teamName.substring(0, 1).toUpperCase()
                     + teamName.substring(1, teamName.length());
 
-            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS)
-            {
-                if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName))
-                {
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
+                if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName)) {
                     uhcPlayer.setTeam(givenTeam);
-                    uhcPlayer.getPlayer().sendMessage(ChatColor.YELLOW + "Your joined the "
+                    uhcPlayer.getPlayer().sendMessage(ChatColor.YELLOW + "You joined the "
                             + teamColor + displayTeamName + ChatColor.YELLOW + " team");
 
                     player.sendMessage(ChatColor.YELLOW + "Successfully put "
@@ -71,8 +68,7 @@ public class TeamCommand extends GameCommand
             // If the provided player name is not found:
             player.sendMessage(ChatColor.RED + "Invalid player name");
             return;
-        }
-        else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
             for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
                 uhcPlayer.setTeam(UHCTeam.UNSET);
                 UHCManager.CONFIG.set("players." + uhcPlayer.getPlayer().getUniqueId().toString() + ".team", UHCTeam.UNSET.name());

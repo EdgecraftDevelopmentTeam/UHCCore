@@ -1,83 +1,82 @@
 package smp.edgecraft.uhc.core.teams;
 
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
-import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.entity.Player;
 
-public class UHCPlayer
-{
+/**
+ * Represents a player who is playing in the UHC
+ */
+public class UHCPlayer {
+    /**
+     * The instance of the player.
+     *
+     * @see Player
+     */
     private Player player;
+    /**
+     * The team the player is on
+     */
     private UHCTeam team;
-    private ChatColor teamColor;
+    /**
+     * The discord account connected to the player
+     */
     private Member discordMember;
 
-    public UHCPlayer(Player player)
-    {
+    /**
+     * Create a new UHC player
+     *
+     * @param player the player object
+     */
+    public UHCPlayer(Player player) {
         this.player = player;
+        this.team = UHCTeam.UNSET.addPlayer(this);
     }
 
-    public UHCPlayer(Player player, UHCTeam uhcTeam)
-    {
-        this.player = player;
-        this.team = uhcTeam;
-        setRespectiveColor();
-    }
-
-    public void link(Member member) {
+    /**
+     * Link a discord member to this player
+     *
+     * @param member The member to link
+     * @return The update player
+     */
+    public UHCPlayer link(Member member) {
         this.discordMember = member;
+        return this;
     }
 
+    /**
+     * @return the discord member linked to this player
+     */
+    @Nullable
     public Member getDiscordMember() {
         return this.discordMember;
     }
 
-    public void setTeam(UHCTeam team)
-    {
+    /**
+     * @return which team the player is on
+     */
+    public UHCTeam getTeam() {
+        return this.team;
+    }
+
+    /**
+     * Sets which team this player is on, removing the player from the previous team, and adding the player to the new team.
+     * Also, this will update the color of the name of the player
+     *
+     * @param team The team to switch the player onto
+     * @return The updated player
+     */
+    public UHCPlayer setTeam(UHCTeam team) {
+        this.team.removePlayer(this);
+        team.addPlayer(this);
         this.team = team;
-        setRespectiveColor();
+        return this;
     }
 
-    public UHCTeam getTeam()
-    {
-        return team;
-    }
-
-    public Player getPlayer()
-    {
-        return player;
-    }
-
-    private void setRespectiveColor()
-    {
-        switch (team)
-        {
-            case BLUE:
-                teamColor = ChatColor.BLUE;
-                break;
-            case RED:
-                teamColor = ChatColor.RED;
-                break;
-            case YELLOW:
-                teamColor = ChatColor.YELLOW;
-                break;
-            case GREEN:
-                teamColor = ChatColor.GREEN;
-                break;
-            case PINK:
-                teamColor = ChatColor.LIGHT_PURPLE;
-                break;
-            default:
-                teamColor = ChatColor.WHITE;
-                break;
-        }
-
-        player.setDisplayName(teamColor + player.getName() + ChatColor.RESET);
-        player.setPlayerListName(teamColor + player.getName() + ChatColor.RESET);
-    }
-
-    public void setTeamColor(ChatColor teamColor)
-    {
-        this.teamColor = teamColor;
+    /**
+     * @return return the instance of the player object
+     */
+    public Player getPlayer() {
+        return this.player;
     }
 }

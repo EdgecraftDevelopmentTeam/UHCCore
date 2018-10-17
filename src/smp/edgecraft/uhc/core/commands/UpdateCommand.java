@@ -11,7 +11,10 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-@CommandInfo(aliases = { "update" }, description = "Update the plugin")
+/**
+ * The update command: used to update the plugin jar automatically
+ */
+@CommandInfo(aliases = {"update"}, description = "Update the plugin")
 public class UpdateCommand extends GameCommand {
 
     public static final String DOWNLOAD_URL = "https://github.com/EdgecraftDevelopmentTeam/UHCCore/blob/master/out/artifacts/UHCCore/UHCCore.jar?raw=true";

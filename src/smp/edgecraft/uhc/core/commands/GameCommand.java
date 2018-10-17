@@ -2,8 +2,11 @@ package smp.edgecraft.uhc.core.commands;
 
 import org.bukkit.entity.Player;
 
+/**
+ * Represents a custom command which can be called by the player
+ */
 public abstract class GameCommand {
-	
-	public abstract void onCommand(Player player, String[] args);
+
+    public abstract void onCommand(Player player, String[] args);
 
 }

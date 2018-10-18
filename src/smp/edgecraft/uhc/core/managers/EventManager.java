@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
@@ -88,6 +89,7 @@ public class EventManager implements Listener {
      */
     @EventHandler
     public void onWorldLoadEvent(WorldLoadEvent event) {
+        UHCCore.instance.getLogger().info("Preparing worlds!");
         UHCManager.prepareWorld();
     }
 

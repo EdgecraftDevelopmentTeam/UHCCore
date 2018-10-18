@@ -1,5 +1,6 @@
 package smp.edgecraft.uhc.core.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import smp.edgecraft.uhc.core.managers.UHCManager;
@@ -18,10 +19,13 @@ public class SpectateCommand extends GameCommand {
             return;
         for (UHCPlayer p: UHCManager.PLAYERS) {
             if (p.getPlayer().equals(player)) {
-                if (p.getTeam() == UHCTeam.SPECTATOR)
+                if (p.getTeam() == UHCTeam.SPECTATOR) {
                     p.setTeam(UHCTeam.UNSET);
-                else
+                    player.sendMessage(ChatColor.GREEN + "You are no longer spectating");
+                } else {
                     p.setTeam(UHCTeam.SPECTATOR);
+                    player.sendMessage(ChatColor.GREEN + "You are now spectating");
+                }
                 break;
             }
         }

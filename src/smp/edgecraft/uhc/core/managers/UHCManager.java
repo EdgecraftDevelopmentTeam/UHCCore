@@ -4,11 +4,14 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
+import smp.edgecraft.uhc.core.util.Countdown;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,6 +98,8 @@ public class UHCManager {
         if (WORLD_OVERWORLD.getMetadata("prepared").size() != 0 && WORLD_OVERWORLD.getMetadata("prepared").get(0).asBoolean())
             return;
 
+        UHCCore.instance.getLogger().info("Preparing the world!");
+
         // Set the overworld spawn and world border
         WORLD_OVERWORLD.setSpawnLocation(CONFIG.getLocation("worlds.overworld.spawn", WORLD_OVERWORLD));
         WORLD_OVERWORLD.getWorldBorder().setCenter(WORLD_OVERWORLD.getSpawnLocation());
@@ -113,6 +118,8 @@ public class UHCManager {
         // Set the daylight cycle to false
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         WORLD_OVERWORLD.setTime(0); // Change the time
+
+        UHCCore.instance.getLogger().info("Building the lobby!");
 
         // Build the lobby
         Bukkit.getScheduler().scheduleSyncDelayedTask(UHCCore.instance, () -> {
@@ -139,10 +146,13 @@ public class UHCManager {
 
             // Teleport anyone who is in the world to the spawn (probably will be no-one)
             WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
+
+            UHCCore.instance.getLogger().info("Built lobby!");
         });
 
         // Make sure we don't prepare the world again
         WORLD_OVERWORLD.setMetadata("prepared", new FixedMetadataValue(UHCCore.instance, true));
+        UHCCore.instance.getLogger().info("Prepared the world!");
     }
 
     /**
@@ -150,6 +160,7 @@ public class UHCManager {
      */
     public static void prepareTeams() {
         try {
+            UHCCore.instance.getLogger().info("Preparing teams!");
             HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>(); // Stores how many players should be on each team
 
             int currentTeamOrdinal = 0;
@@ -220,6 +231,7 @@ public class UHCManager {
                     TEAMS.add(team); // Add the active teams
 
             announce(ChatColor.GREEN + "Successfully created teams");
+            UHCCore.instance.getLogger().info("Prepared the teams!");
         } catch (Exception e) {
             UHCManager.announce(e);
             e.printStackTrace();
@@ -235,8 +247,52 @@ public class UHCManager {
             announce(ChatColor.RED + "Not every player is on a team!");
             return;
         }
-        // Countdown
-        title(ChatColor.GOLD + "Let the games begin!", "");
+        /*
+        if (PLAYERS.size() == 1) {
+            announce(ChatColor.RED + "There aren't enough players!");
+            return;
+        }
+        */
+
+        UHCCore.instance.getLogger().info("Starting the game!");
+
+        // Teleport the teams
+        ArrayList<Integer> chosenIndicies = new ArrayList<>();
+        Random random = new Random();
+        for (UHCTeam team : TEAMS) {
+            int index = random.nextInt(8) + 1;
+            while (chosenIndicies.contains(index))
+                index = random.nextInt(8) + 1;
+            Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
+            location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location) + 2);
+            WORLD_OVERWORLD.getChunkAt(location).load();
+            location.setPitch(90F);
+            team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
+        }
+
+        // Stop the players from moving
+        PLAYERS.forEach(player -> {
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 255, true, false));
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 99999, 255, true, false));
+            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, true, false));
+        });
+
+        Countdown countdown = new Countdown(3) {
+            @Override
+            public void tick(int time) {
+                title(ChatColor.GOLD + "The game begins in", ChatColor.GREEN + String.valueOf(time));
+            }
+
+            @Override
+            public void finished() {
+                title(ChatColor.GOLD + "Let the games begin!", "");
+                PLAYERS.forEach(player -> {
+                    player.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+                    player.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+                });
+            }
+        };
+        countdown.start();
 
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true); // Set the daylight cycle to true
         WORLD_OVERWORLD.getPlayers().forEach(player -> {
@@ -251,19 +307,6 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
 
         UHCBot.movePlayersInVC(); // Move the players to the correct voice chat
-
-        // Teleport the teams
-        ArrayList<Integer> chosenIndicies = new ArrayList<>();
-        Random random = new Random();
-        for (UHCTeam team : TEAMS) {
-            int index = random.nextInt(8) + 1;
-            while (chosenIndicies.contains(index))
-                index = random.nextInt(8) + 1;
-            Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
-            location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location));
-            location.setPitch(90F);
-            team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
-        }
     }
 
     /**
@@ -279,17 +322,6 @@ public class UHCManager {
             player.setTeam(UHCTeam.SPECTATOR);
             player.getPlayer().setGameMode(GameMode.SPECTATOR);
         });
-    }
-
-    /**
-     * Says whether the player should be dead when they are hurt. E.g. they shouldn't be dead if they have a totem of undying in their offhand or
-     *
-     * @param player The player to test
-     * @param event  The event holding the damage information
-     * @return whether the player should be dead
-     */
-    public static boolean shouldBeDead(Player player, EntityDamageEvent event) {
-        return player.getInventory().getItemInOffHand().getType() != Material.TOTEM_OF_UNDYING && UHCManager.GAME_STATUS == GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0;
     }
 
     /**

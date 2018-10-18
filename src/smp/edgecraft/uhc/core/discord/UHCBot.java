@@ -136,7 +136,8 @@ public class UHCBot extends ListenerAdapter {
      * @param player The player to move
      */
     public static void movePlayerToMainVC(UHCPlayer player) {
-        guildController.moveVoiceMember(player.getDiscordMember(), mainChannel).queue();
+        if (mainChannel.getMembers().contains(player.getDiscordMember()))
+            guildController.moveVoiceMember(player.getDiscordMember(), mainChannel).queue();
     }
 
     /**

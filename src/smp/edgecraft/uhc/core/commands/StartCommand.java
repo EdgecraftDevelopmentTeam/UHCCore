@@ -7,7 +7,7 @@ import smp.edgecraft.uhc.core.managers.UHCManager;
 /**
  * The start command: starts the UHC match!
  */
-@CommandInfo(aliases = {"start"}, description = "Starts the UHC")
+@CommandInfo(aliases = {"start"}, description = "Starts the UHC", permission = "uhc.start")
 public class StartCommand extends GameCommand {
 
     @Override

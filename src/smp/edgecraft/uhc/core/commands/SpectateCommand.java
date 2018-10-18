@@ -10,7 +10,7 @@ import smp.edgecraft.uhc.core.teams.UHCTeam;
 /**
  * The spectate command: states the user wishes to spectate the UHC.
  */
-@CommandInfo(aliases = {"spectate"}, description = "Spectate the current uhc")
+@CommandInfo(aliases = {"spectate"}, description = "Spectate the current uhc", permission = "uhc.spectate")
 public class SpectateCommand extends GameCommand {
 
     @Override

@@ -14,7 +14,7 @@ import java.nio.channels.ReadableByteChannel;
 /**
  * The update command: used to update the plugin jar automatically
  */
-@CommandInfo(aliases = {"update"}, description = "Update the plugin")
+@CommandInfo(aliases = {"update"}, description = "Update the plugin", permission = "uhc.update")
 public class UpdateCommand extends GameCommand {
 
     public static final String DOWNLOAD_URL = "https://github.com/EdgecraftDevelopmentTeam/UHCCore/blob/master/out/artifacts/UHCCore/UHCCore.jar?raw=true";

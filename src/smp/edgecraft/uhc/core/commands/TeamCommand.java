@@ -9,7 +9,7 @@ import smp.edgecraft.uhc.core.teams.UHCTeam;
 /**
  * Manually puts a player onto a specific team
  */
-@CommandInfo(aliases = {"team"}, description = "Manually join a team")
+@CommandInfo(aliases = {"team"}, description = "Manually join a team", permission = "uhc.team")
 public class TeamCommand extends GameCommand {
     @Override
     public void onCommand(Player player, String[] args) {

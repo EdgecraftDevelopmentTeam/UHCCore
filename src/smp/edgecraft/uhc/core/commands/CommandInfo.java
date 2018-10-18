@@ -17,4 +17,6 @@ public @interface CommandInfo {
 
     String[] aliases();
 
+    String permission();
+
 }

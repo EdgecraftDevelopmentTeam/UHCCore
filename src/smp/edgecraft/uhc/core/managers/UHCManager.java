@@ -322,6 +322,8 @@ public class UHCManager {
             player.setTeam(UHCTeam.SPECTATOR);
             player.getPlayer().setGameMode(GameMode.SPECTATOR);
         });
+
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
     }
 
     /**

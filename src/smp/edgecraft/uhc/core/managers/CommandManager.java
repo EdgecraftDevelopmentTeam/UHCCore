@@ -37,7 +37,6 @@ public class CommandManager implements CommandExecutor {
         this.commands.add(new TeamCommand());
         this.commands.add(new UpdateCommand());
         this.commands.add(new LinkCommand());
-        this.commands.add(new DebugCommand());
     }
 
     @Override
@@ -53,8 +52,9 @@ public class CommandManager implements CommandExecutor {
                 // Prints the help commands
                 for (GameCommand cmd : this.commands) {
                     CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
-                    player.sendMessage(ChatColor.GOLD + "/uhc " + StringUtils.join(info.aliases(), ", ").trim()
-                            + " - " + info.description());
+                    if (player.hasPermission(info.permission()))
+                        player.sendMessage(ChatColor.GOLD + "/uhc " + StringUtils.join(info.aliases(), ", ").trim()
+                                + " - " + info.description());
                 }
 
                 return true;
@@ -66,6 +66,10 @@ public class CommandManager implements CommandExecutor {
                 CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
                 for (String alias : info.aliases()) {
                     if (args[0].equals(alias)) {
+                        if (!player.hasPermission(info.permission())) {
+                            player.sendMessage(ChatColor.RED + "You do not have permission to run this command!");
+                            return true;
+                        }
                         target = cmd;
                         break;
                     }

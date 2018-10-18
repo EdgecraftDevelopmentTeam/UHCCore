@@ -8,3 +8,22 @@ commands:
   uhc:
     description: The main command for the UHC
     usage: /uhc
+permissions:
+  uhc.link:
+    description: Link a discord user with a minecraft account
+    default: true
+  uhc.prepare:
+    description: Prepare the teams
+    default: op
+  uhc.spectate:
+    description: Join the spectator team
+    default: true
+  uhc.start:
+    description: Start the UHC
+    default: op
+  uhc.team:
+    description: Manually set a player's team
+    default: op
+  uhc.update:
+    description: Update the plugin
+    default: op

@@ -247,12 +247,10 @@ public class UHCManager {
             announce(ChatColor.RED + "Not every player is on a team!");
             return;
         }
-        /*
         if (PLAYERS.size() == 1) {
             announce(ChatColor.RED + "There aren't enough players!");
             return;
         }
-        */
 
         UHCCore.instance.getLogger().info("Starting the game!");
 

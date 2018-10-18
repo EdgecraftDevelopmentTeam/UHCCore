@@ -2,6 +2,7 @@ package smp.edgecraft.uhc.core.teams;
 
 import org.bukkit.ChatColor;
 import smp.edgecraft.uhc.core.managers.SettingsManager;
+import smp.edgecraft.uhc.core.managers.UHCManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,8 @@ public enum UHCTeam {
     RED(ChatColor.RED),
     YELLOW(ChatColor.YELLOW),
     GREEN(ChatColor.GREEN),
-    PINK(ChatColor.LIGHT_PURPLE);
+    PINK(ChatColor.LIGHT_PURPLE),
+    SPECTATOR(ChatColor.DARK_GRAY);
 
     /**
      * The list of all the players on the team
@@ -56,6 +58,7 @@ public enum UHCTeam {
     public UHCTeam addPlayer(UHCPlayer player) {
         if (UNSET.getPlayers().contains(player))
             UNSET.removePlayer(player);
+        UHCManager.CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", this.name()); // Update the config
         player.getPlayer().setDisplayName(this.teamColor + player.getPlayer().getName() + ChatColor.RESET);
         player.getPlayer().setPlayerListName(this.teamColor + player.getPlayer().getName() + ChatColor.RESET);
         this.players.add(player);
@@ -82,5 +85,12 @@ public enum UHCTeam {
      */
     public boolean isActive() {
         return this.players.size() > 0;
+    }
+
+    /**
+     * @return the chat color of the team
+     */
+    public ChatColor getTeamColor() {
+        return this.teamColor;
     }
 }

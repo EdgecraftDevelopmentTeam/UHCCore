@@ -18,8 +18,8 @@ public class TeamCommand extends GameCommand {
         if (args.length == 2) {
             String teamName = args[0];
             String givenPlayerName = args[1];
-            UHCTeam givenTeam = null;
-            ChatColor teamColor = null;
+            UHCTeam givenTeam;
+            ChatColor teamColor;
 
             teamName = teamName.toLowerCase();
 
@@ -50,7 +50,7 @@ public class TeamCommand extends GameCommand {
             }
 
             String displayTeamName = teamName.substring(0, 1).toUpperCase()
-                    + teamName.substring(1, teamName.length());
+                    + teamName.substring(1);
 
             for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
                 if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName)) {
@@ -67,11 +67,9 @@ public class TeamCommand extends GameCommand {
             }
             // If the provided player name is not found:
             player.sendMessage(ChatColor.RED + "Invalid player name");
-            return;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
             for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
                 uhcPlayer.setTeam(UHCTeam.UNSET);
-                UHCManager.CONFIG.set("players." + uhcPlayer.getPlayer().getUniqueId().toString() + ".team", UHCTeam.UNSET.name());
             }
             player.sendMessage(ChatColor.GREEN + "Reset teams!");
         }

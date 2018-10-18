@@ -28,10 +28,10 @@ public class CommandManager implements CommandExecutor {
      */
     private ArrayList<GameCommand> commands;
 
-    protected CommandManager() {
+    CommandManager() {
         this.commands = new ArrayList<>();
 
-        // this.commands.add(new SpectateCommand()); TODO finish
+        this.commands.add(new SpectateCommand());
         this.commands.add(new PrepareCommand());
         this.commands.add(new StartCommand());
         this.commands.add(new TeamCommand());

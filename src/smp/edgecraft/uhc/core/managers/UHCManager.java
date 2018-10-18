@@ -4,7 +4,6 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
@@ -56,49 +55,66 @@ public class UHCManager {
      * Called when the plugin is first enabled.
      */
     public static void onEnable() {
+        prepareWorld();
         PLAYERS = new ArrayList<>();
         TEAMS = new ArrayList<>();
 
-        for (Player player : Bukkit.getOnlinePlayers())
-        {
-            UHCPlayer uhcPlayer = new UHCPlayer(player);
-            UHCManager.PLAYERS.add(uhcPlayer);
-
-            if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
-                UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".team"));
-                uhcPlayer.setTeam(team);
-            }
-            if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
-                uhcPlayer.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
-            }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            preparePlayer(player);
         }
     }
 
+    /**
+     * Prepares the given player by linking their discord if they have already ran the link command before
+     *
+     * @param player The player to prepare
+     */
+    private static void preparePlayer(Player player) {
+        UHCPlayer uhcPlayer = new UHCPlayer(player);
+        UHCManager.PLAYERS.add(uhcPlayer);
+
+        if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
+            UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".team"));
+            uhcPlayer.setTeam(team);
+        }
+        if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
+            uhcPlayer.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
+        }
+    }
+
+    /**
+     * Prepares the world by creating a barrier lobby, setting the world spawns and the world border size
+     */
     public static void prepareWorld() {
+        // Initialise the world variables
         WORLD_OVERWORLD = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.overworld.name"));
         WORLD_NETHER = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.nether.name"));
         WORLD_END = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.end.name"));
 
-        if (WORLD_OVERWORLD.getMetadata("prepared").get(0).asBoolean())
+        // Check if the world has already been prepared, if so, we don't need to do it again
+        if (WORLD_OVERWORLD.getMetadata("prepared").size() != 0 && WORLD_OVERWORLD.getMetadata("prepared").get(0).asBoolean())
             return;
 
+        // Set the overworld spawn and world border
         WORLD_OVERWORLD.setSpawnLocation(CONFIG.getLocation("worlds.overworld.spawn", WORLD_OVERWORLD));
         WORLD_OVERWORLD.getWorldBorder().setCenter(WORLD_OVERWORLD.getSpawnLocation());
         WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        // Set the nether spawn and world border
         WORLD_NETHER.setSpawnLocation(CONFIG.getLocation("worlds.nether.spawn", WORLD_NETHER));
         WORLD_NETHER.getWorldBorder().setCenter(WORLD_NETHER.getSpawnLocation());
         WORLD_NETHER.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        // Set the end spawn and world border
         WORLD_END.setSpawnLocation(CONFIG.getLocation("worlds.end.spawn", WORLD_END));
         WORLD_END.getWorldBorder().setCenter(WORLD_END.getSpawnLocation());
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.size"));
 
+        // Set the daylight cycle to false
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        WORLD_OVERWORLD.setTime(0);
+        WORLD_OVERWORLD.setTime(0); // Change the time
 
-        announce(ChatColor.GREEN + "World borders created!");
-
+        // Build the lobby
         Bukkit.getScheduler().scheduleSyncDelayedTask(UHCCore.instance, () -> {
             int y = (int) WORLD_OVERWORLD.getSpawnLocation().getY() - 1;
             for (int x = (int) (WORLD_OVERWORLD.getSpawnLocation().getX() - CONFIG.<Integer>get("lobby.width") / 2); x < WORLD_OVERWORLD.getSpawnLocation().getX() + CONFIG.<Integer>get("lobby.width") / 2; x++) {
@@ -106,7 +122,6 @@ public class UHCManager {
                     WORLD_OVERWORLD.getBlockAt(x, y, z).setType(Material.BARRIER);
             }
 
-            // Build lobby
             for (int y2 = y; y2 < y + CONFIG.<Integer>get("lobby.height") + 1; y2++) {
                 int z = (int) WORLD_OVERWORLD.getSpawnLocation().getZ() - CONFIG.<Integer>get("lobby.depth") / 2;
                 for (int x2 = (int) (WORLD_OVERWORLD.getSpawnLocation().getX() - CONFIG.<Integer>get("lobby.width") / 2); x2 < WORLD_OVERWORLD.getSpawnLocation().getX() + CONFIG.<Integer>get("lobby.width") / 2; x2++)
@@ -122,86 +137,87 @@ public class UHCManager {
                     WORLD_OVERWORLD.getBlockAt(x, y2, z2).setType(Material.BARRIER);
             }
 
+            // Teleport anyone who is in the world to the spawn (probably will be no-one)
             WORLD_OVERWORLD.getPlayers().forEach(player -> player.teleport(WORLD_OVERWORLD.getSpawnLocation()));
-
-            announce(ChatColor.GREEN + "Lobby created!");
         });
 
+        // Make sure we don't prepare the world again
         WORLD_OVERWORLD.setMetadata("prepared", new FixedMetadataValue(UHCCore.instance, true));
     }
 
-    public static void prepareTeams()
-    {
+    /**
+     * Prepares the teams by putting the players on the correct team
+     */
+    public static void prepareTeams() {
         try {
-            HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>();
+            HashMap<UHCTeam, Integer> playersPerTeam = new HashMap<>(); // Stores how many players should be on each team
 
             int currentTeamOrdinal = 0;
 
+            // Initialise the hashmap
             for (UHCTeam team : UHCTeam.values())
-                if (team != UHCTeam.UNSET)
+                if (team != UHCTeam.UNSET && team != UHCTeam.SPECTATOR)
                     playersPerTeam.put(team, 0);
 
+            // Setup the players
             for (Player player : Bukkit.getOnlinePlayers()) {
                 boolean found = false;
+                // Check if the player already has been setup
                 for (UHCPlayer uhcPlayer : PLAYERS) {
                     if (uhcPlayer.getPlayer().equals(player)) {
                         found = true;
                         break;
                     }
                 }
-                if (!found) {
-                    UHCPlayer uhcPlayer = new UHCPlayer(player);
-                    UHCManager.PLAYERS.add(uhcPlayer);
-
-                    if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".team")) {
-                        UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("teams.players." + player.getUniqueId().toString() + ".team"));
-                        uhcPlayer.setTeam(team);
-                    }
-                    if (UHCManager.CONFIG.contains("players." + player.getUniqueId().toString() + ".discord")) {
-                        uhcPlayer.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getUniqueId().toString() + ".discord")));
-                    }
+                if (!found) { // If not, set the player up
+                    preparePlayer(player);
                 }
             }
 
-            for (UHCPlayer player : PLAYERS)
-            {
+            // Calculate the number of players that should be on each team
+            for (UHCPlayer player : PLAYERS) {
+                if (player.getTeam() == UHCTeam.SPECTATOR)
+                    continue;
                 currentTeamOrdinal++;
-                if (currentTeamOrdinal >= UHCTeam.values().length)
+                if (currentTeamOrdinal >= UHCTeam.values().length - 1) // Ignore the spectator team
                     currentTeamOrdinal = 1;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
-                playersPerTeam.put(team, playersPerTeam.get(team).intValue() + 1);
+                playersPerTeam.put(team, playersPerTeam.get(team) + 1);
             }
 
+            // Runs through the players who have no team
             ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
 
             Random random = new Random();
 
             currentTeamOrdinal = 1;
 
+            // Give each player a team
             for (int i = 0; i < PLAYERS.size(); i++) {
+                // Select a random player who hasn't had a team set
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
+                if (player.getTeam() == UHCTeam.SPECTATOR) // Skip any spectators
+                    continue;
                 int timesRan = 0;
                 UHCTeam team = UHCTeam.values()[currentTeamOrdinal];
-                while (team.getPlayers().size() == playersPerTeam.get(team).intValue()) {
+                while (team.getPlayers().size() == playersPerTeam.get(team)) { // While the select team is full
                     currentTeamOrdinal++;
-                    if (currentTeamOrdinal >= UHCTeam.values().length)
+                    if (currentTeamOrdinal >= UHCTeam.values().length - 1) // Ignore the spectator team
                         currentTeamOrdinal = 1;
                     timesRan++;
                     team = UHCTeam.values()[currentTeamOrdinal];
-                    if (timesRan == UHCTeam.values().length - 1)
+                    if (timesRan == UHCTeam.values().length - 2)
                         break;
                 }
                 if (currentTeamOrdinal > UHCTeam.values().length)
                     currentTeamOrdinal = 1;
-                player.setTeam(team);
-                team.getPlayers().add(player);
-                CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", team.name());
+                player.setTeam(team); // Change the team
                 unteamedPlayers.remove(player);
             }
 
             for (UHCTeam team : UHCTeam.values())
                 if (team.isActive())
-                    TEAMS.add(team);
+                    TEAMS.add(team); // Add the active teams
 
             announce(ChatColor.GREEN + "Successfully created teams");
         } catch (Exception e) {
@@ -210,24 +226,33 @@ public class UHCManager {
         }
 
     }
-  
-    public static void start() {
-        // Countdown
 
-        WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+    /**
+     * Starts the UHC
+     */
+    public static void start() {
+        if (UHCTeam.UNSET.getPlayers().size() > 0) {
+            announce(ChatColor.RED + "Not every player is on a team!");
+            return;
+        }
+        // Countdown
+        title(ChatColor.GOLD + "Let the games begin!", "");
+
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true); // Set the daylight cycle to true
         WORLD_OVERWORLD.getPlayers().forEach(player -> {
-            player.setGameMode(GameMode.SURVIVAL);
-            player.removePotionEffect(PotionEffectType.SATURATION);
+            player.setGameMode(GameMode.SURVIVAL); // Update the gamemodes
+            player.removePotionEffect(PotionEffectType.SATURATION); // Remove the saturation effect
         });
-        // GAME_STATUS = GameStatus.RUNNING; TODO switch game status
+        GAME_STATUS = GameStatus.RUNNING;
 
         // Shrink border
         WORLD_OVERWORLD.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
         WORLD_NETHER.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
 
-        UHCBot.movePlayersInVC();
+        UHCBot.movePlayersInVC(); // Move the players to the correct voice chat
 
+        // Teleport the teams
         ArrayList<Integer> chosenIndicies = new ArrayList<>();
         Random random = new Random();
         for (UHCTeam team : TEAMS) {
@@ -235,34 +260,73 @@ public class UHCManager {
             while (chosenIndicies.contains(index))
                 index = random.nextInt(8) + 1;
             Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
-            location.setPitch(-90F);
+            location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location));
+            location.setPitch(90F);
             team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
-            // Begin animation of dropping
         }
     }
 
-    public static boolean shouldBeDead(Player player, EntityDamageEvent event) {
-        return !(player.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING || player.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) && UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0;
+    /**
+     * Called when the given team wins
+     *
+     * @param team The winning team
+     */
+    public static void win(UHCTeam team) {
+        announce(ChatColor.GOLD + "The " + ChatColor.BOLD + team.getTeamColor() + team.name().toLowerCase() + ChatColor.RESET + ChatColor.GOLD + " team wins!");
+        // Some win particle / sound?
+        GAME_STATUS = GameStatus.FINISHED;
+        team.getPlayers().forEach(player -> {
+            player.setTeam(UHCTeam.SPECTATOR);
+            player.getPlayer().setGameMode(GameMode.SPECTATOR);
+        });
     }
 
+    /**
+     * Says whether the player should be dead when they are hurt. E.g. they shouldn't be dead if they have a totem of undying in their offhand or
+     *
+     * @param player The player to test
+     * @param event  The event holding the damage information
+     * @return whether the player should be dead
+     */
+    public static boolean shouldBeDead(Player player, EntityDamageEvent event) {
+        return player.getInventory().getItemInOffHand().getType() != Material.TOTEM_OF_UNDYING && UHCManager.GAME_STATUS == GameStatus.RUNNING && player.getHealth() - event.getFinalDamage() <= 0;
+    }
+
+    /**
+     * Message every player online the given message
+     *
+     * @param message The message to announce
+     */
     public static void announce(String message) {
         Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(message));
     }
 
+    /**
+     * Send a title to every online player
+     *
+     * @param message  The message to send
+     * @param subtitle The subtitle to send
+     */
     public static void title(String message, String subtitle) {
-        WORLD_OVERWORLD.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
-        WORLD_NETHER.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
-        WORLD_END.getPlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(message, subtitle, 10, 70, 20));
     }
 
+    /**
+     * Announce an exception to everyone online
+     *
+     * @param e The exception to announce
+     */
     public static void announce(Exception e) {
         announce(ChatColor.RED + e.toString());
         for (StackTraceElement element : e.getStackTrace())
             announce(ChatColor.RED + element.toString());
     }
 
+    /**
+     * The current game status
+     */
     public enum GameStatus {
-        LOBBY, RUNNING, FINISHED;
+        LOBBY, RUNNING, FINISHED
     }
 
 }

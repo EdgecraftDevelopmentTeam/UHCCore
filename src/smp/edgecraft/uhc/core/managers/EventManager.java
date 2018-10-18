@@ -7,13 +7,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles all of the events that the UHC uses
@@ -32,17 +33,32 @@ public class EventManager implements Listener {
         Player player = (Player) event.getEntity();
         if (UHCManager.shouldBeDead(player, event)) {
             player.setGameMode(GameMode.SPECTATOR);
+            List<UHCPlayer> remainingPlayers = new ArrayList<>();
             for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
+                if (uhcPlayer.getTeam() != UHCTeam.SPECTATOR && uhcPlayer.getTeam() != UHCTeam.UNSET)
+                    remainingPlayers.add(uhcPlayer);
                 if (uhcPlayer.getPlayer().equals(player)) {
-                    uhcPlayer.setTeam(UHCTeam.UNSET);
+                    uhcPlayer.setTeam(UHCTeam.SPECTATOR);
                     if (uhcPlayer.getDiscordMember() != null) {
                         UHCBot.movePlayerToMainVC(uhcPlayer);
-                        break;
                     }
                 }
             }
 
-            // TODO Check win
+            if (remainingPlayers.size() == 1) { // If there is now only one alive player left
+                UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
+            } else if (remainingPlayers.size() > 0) { // Check if there is only one team left
+                UHCTeam team = remainingPlayers.get(0).getTeam(); // One of the teams left
+                boolean over = true;
+                for (UHCPlayer uhcPlayer : remainingPlayers) {
+                    if (uhcPlayer.getTeam() != team) { // If a player is on a different team
+                        over = false; // The game is not yet over
+                        break;
+                    }
+                }
+                if (over)
+                    UHCManager.win(team);
+            }
         }
     }
 
@@ -81,16 +97,6 @@ public class EventManager implements Listener {
         if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".discord")) {
             player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
         }
-    }
-
-    /**
-     * Prepares the world when it is loaded if it is not already prepared
-     * @param event The event to hook into
-     */
-    @EventHandler
-    public void onWorldLoadEvent(WorldLoadEvent event) {
-        UHCCore.instance.getLogger().info("Preparing worlds!");
-        UHCManager.prepareWorld();
     }
 
 }

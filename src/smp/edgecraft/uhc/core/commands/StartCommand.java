@@ -13,7 +13,6 @@ public class StartCommand extends GameCommand {
     @Override
     public void onCommand(Player player, String[] args) {
         UHCManager.start();
-        UHCManager.title(ChatColor.GOLD + "Let the games begin!", "");
     }
 
 }

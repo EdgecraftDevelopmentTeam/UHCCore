@@ -1,5 +1,4 @@
 worlds:
-  prepared: false
   overworld:
     name: world
     spawn:

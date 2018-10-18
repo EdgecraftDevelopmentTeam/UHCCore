@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.discord.UHCBot;
@@ -79,6 +80,15 @@ public class EventManager implements Listener {
         if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".discord")) {
             player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
         }
+    }
+
+    /**
+     * Prepares the world when it is loaded if it is not already prepared
+     * @param event The event to hook into
+     */
+    @EventHandler
+    public void onWorldLoadEvent(WorldLoadEvent event) {
+        UHCManager.prepareWorld();
     }
 
 }

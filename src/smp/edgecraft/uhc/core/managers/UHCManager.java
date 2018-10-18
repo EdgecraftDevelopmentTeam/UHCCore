@@ -3,6 +3,8 @@ package smp.edgecraft.uhc.core.managers;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
@@ -13,21 +15,47 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * Handles the whole entire UHC
+ */
 public class UHCManager {
 
+    /**
+     * The configuration file
+     */
     public static final SettingsManager CONFIG = SettingsManager.getConfig("uhc");
 
+    /**
+     * The state the game is in
+     */
     public static GameStatus GAME_STATUS = GameStatus.LOBBY;
 
+    /**
+     * The instance of the overworld
+     */
     public static World WORLD_OVERWORLD;
+    /**
+     * The instance of the nether
+     */
     public static World WORLD_NETHER;
+    /**
+     * The instance of the end
+     */
     public static World WORLD_END;
 
+    /**
+     * All of the online players
+     */
     public static ArrayList<UHCPlayer> PLAYERS;
+    /**
+     * All of the active teams
+     */
     public static ArrayList<UHCTeam> TEAMS;
 
+    /**
+     * Called when the plugin is first enabled.
+     */
     public static void onEnable() {
-        prepareWorld();
         PLAYERS = new ArrayList<>();
         TEAMS = new ArrayList<>();
 
@@ -51,7 +79,7 @@ public class UHCManager {
         WORLD_NETHER = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.nether.name"));
         WORLD_END = Bukkit.getWorld(UHCManager.CONFIG.<String>get("worlds.end.name"));
 
-        if (CONFIG.<Boolean>get("worlds.prepared"))
+        if (WORLD_OVERWORLD.getMetadata("prepared").get(0).asBoolean())
             return;
 
         WORLD_OVERWORLD.setSpawnLocation(CONFIG.getLocation("worlds.overworld.spawn", WORLD_OVERWORLD));
@@ -99,7 +127,7 @@ public class UHCManager {
             announce(ChatColor.GREEN + "Lobby created!");
         });
 
-        CONFIG.set("worlds.prepared", true);
+        WORLD_OVERWORLD.setMetadata("prepared", new FixedMetadataValue(UHCCore.instance, true));
     }
 
     public static void prepareTeams()

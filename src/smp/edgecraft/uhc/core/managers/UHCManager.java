@@ -2,11 +2,9 @@ package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
@@ -118,6 +116,7 @@ public class UHCManager {
         // Set the daylight cycle to false
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         WORLD_OVERWORLD.setTime(0); // Change the time
+        WORLD_OVERWORLD.setGameRule(GameRule.NATURAL_REGENERATION, false);
 
         UHCCore.instance.getLogger().info("Building the lobby!");
 
@@ -197,7 +196,10 @@ public class UHCManager {
             }
 
             // Runs through the players who have no team
-            ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>(PLAYERS);
+            ArrayList<UHCPlayer> unteamedPlayers = new ArrayList<>();
+            for (UHCPlayer player : PLAYERS)
+                if (player.getTeam() != UHCTeam.SPECTATOR)
+                    unteamedPlayers.add(player);
 
             Random random = new Random();
 
@@ -205,6 +207,8 @@ public class UHCManager {
 
             // Give each player a team
             for (int i = 0; i < PLAYERS.size(); i++) {
+                if (unteamedPlayers.size() == 0)
+                    break;
                 // Select a random player who hasn't had a team set
                 UHCPlayer player = unteamedPlayers.get(random.nextInt(unteamedPlayers.size()));
                 if (player.getTeam() == UHCTeam.SPECTATOR) // Skip any spectators
@@ -258,11 +262,13 @@ public class UHCManager {
         ArrayList<Integer> chosenIndicies = new ArrayList<>();
         Random random = new Random();
         for (UHCTeam team : TEAMS) {
+            if (team == UHCTeam.SPECTATOR)
+                continue;
             int index = random.nextInt(8) + 1;
             while (chosenIndicies.contains(index))
                 index = random.nextInt(8) + 1;
             Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
-            location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location) + 2);
+            location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location) + 3);
             WORLD_OVERWORLD.getChunkAt(location).load();
             location.setPitch(90F);
             team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
@@ -270,9 +276,11 @@ public class UHCManager {
 
         // Stop the players from moving
         PLAYERS.forEach(player -> {
-            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 255, true, false));
-            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 99999, 255, true, false));
-            player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, true, false));
+            if (player.getTeam() != UHCTeam.SPECTATOR) {
+                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 255, true, false));
+                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 99999, 255, true, false));
+                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, true, false));
+            }
         });
 
         Countdown countdown = new Countdown(3) {
@@ -285,17 +293,26 @@ public class UHCManager {
             public void finished() {
                 title(ChatColor.GOLD + "Let the games begin!", "");
                 PLAYERS.forEach(player -> {
-                    player.getPlayer().removePotionEffect(PotionEffectType.SLOW);
-                    player.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+                    if (player.getTeam() != UHCTeam.SPECTATOR) {
+                        player.getPlayer().removePotionEffect(PotionEffectType.SLOW);
+                        player.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+                    }
                 });
             }
         };
         countdown.start();
 
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true); // Set the daylight cycle to true
+        PLAYERS.forEach(player -> {
+            if (player.getTeam() != UHCTeam.SPECTATOR) {
+                player.getPlayer().setGameMode(GameMode.SURVIVAL); // Update the gamemodes
+                player.getPlayer().removePotionEffect(PotionEffectType.SATURATION); // Remove the saturation effect
+            } else {
+                player.getPlayer().setGameMode(GameMode.SPECTATOR);
+            }
+        });
         WORLD_OVERWORLD.getPlayers().forEach(player -> {
-            player.setGameMode(GameMode.SURVIVAL); // Update the gamemodes
-            player.removePotionEffect(PotionEffectType.SATURATION); // Remove the saturation effect
+
         });
         GAME_STATUS = GameStatus.RUNNING;
 

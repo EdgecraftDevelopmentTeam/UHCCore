@@ -27,52 +27,38 @@ public class EventManager implements Listener {
 
     private static HashMap<Player, Location> respawnLocations = new HashMap<>();
 
-    /**
-     * Handles win detection when the last player is killed
-     *
-     * @param event The event to hook into
-     */
     @EventHandler
-    public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        player.setGameMode(GameMode.SPECTATOR);
-        respawnLocations.put(player, player.getLocation());
-        List<UHCPlayer> remainingPlayers = new ArrayList<>();
-        for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
-            if (uhcPlayer.getPlayer().equals(player)) {
-                uhcPlayer.setTeam(UHCTeam.SPECTATOR);
-                if (uhcPlayer.getDiscordMember() != null) {
-                    UHCBot.movePlayerToMainVC(uhcPlayer);
-                }
-            } else if (uhcPlayer.getTeam() != UHCTeam.SPECTATOR && uhcPlayer.getTeam() != UHCTeam.UNSET)
-                remainingPlayers.add(uhcPlayer);
-        }
-
-        if (remainingPlayers.size() == 1) { // If there is now only one alive player left
-            UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
-        } else if (remainingPlayers.size() > 0) { // Check if there is only one team left
-            UHCTeam team = remainingPlayers.get(0).getTeam(); // One of the teams left
-            boolean over = true;
-            for (UHCPlayer uhcPlayer : remainingPlayers) {
-                if (uhcPlayer.getTeam() != team) { // If a player is on a different team
-                    over = false; // The game is not yet over
-                    break;
-                }
+    public void onEntityDamageEvent(EntityDamageEvent event) {
+        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && event.getEntity() instanceof Player &&  ((Player) event.getEntity()).getHealth() - event.getDamage() <= 0) {
+            // die
+            event.setCancelled(true);
+            Player player = (Player) event.getEntity();
+            player.setGameMode(GameMode.SPECTATOR);
+            List<UHCPlayer> remainingPlayers = new ArrayList<>();
+            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
+                if (uhcPlayer.getPlayer().equals(player)) {
+                    uhcPlayer.setTeam(UHCTeam.SPECTATOR);
+                    if (uhcPlayer.getDiscordMember() != null) {
+                        UHCBot.movePlayerToMainVC(uhcPlayer);
+                    }
+                } else if (uhcPlayer.getTeam() != UHCTeam.SPECTATOR && uhcPlayer.getTeam() != UHCTeam.UNSET)
+                    remainingPlayers.add(uhcPlayer);
             }
-            if (over)
-                UHCManager.win(team);
-        }
-    }
 
-    /**
-     * Makes the player respawn where they died
-     * @param event The event to hook into
-     */
-    @EventHandler
-    public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
-        if (respawnLocations.containsKey(event.getPlayer())) {
-            event.setRespawnLocation(respawnLocations.get(event.getPlayer()));
-            respawnLocations.remove(event.getPlayer());
+            if (remainingPlayers.size() == 1) { // If there is now only one alive player left
+                UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
+            } else if (remainingPlayers.size() > 0) { // Check if there is only one team left
+                UHCTeam team = remainingPlayers.get(0).getTeam(); // One of the teams left
+                boolean over = true;
+                for (UHCPlayer uhcPlayer : remainingPlayers) {
+                    if (uhcPlayer.getTeam() != team) { // If a player is on a different team
+                        over = false; // The game is not yet over
+                        break;
+                    }
+                }
+                if (over)
+                    UHCManager.win(team);
+            }
         }
     }
 

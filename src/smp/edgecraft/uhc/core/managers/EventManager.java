@@ -8,8 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.discord.UHCBot;
@@ -34,6 +36,7 @@ public class EventManager implements Listener {
             event.setCancelled(true);
             Player player = (Player) event.getEntity();
             player.setGameMode(GameMode.SPECTATOR);
+            UHCManager.announce(deathMessage(player, event.getCause()));
             List<UHCPlayer> remainingPlayers = new ArrayList<>();
             for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
                 if (uhcPlayer.getPlayer().equals(player)) {
@@ -62,6 +65,67 @@ public class EventManager implements Listener {
         }
     }
 
+    private String deathMessage(Player p, EntityDamageEvent.DamageCause cause) {
+        String message = "";
+
+        if(cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
+            message = p.getCustomName() + " blew up";
+        }
+        if(cause == EntityDamageEvent.DamageCause.WITHER) {
+            message = p.getCustomName() + " withered away";
+        }
+        if(cause == EntityDamageEvent.DamageCause.DROWNING) {
+            message = p.getCustomName() + " drowned";
+        }
+        if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK || cause == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
+            message = p.getCustomName() + " was slain";
+        }
+        if(cause == EntityDamageEvent.DamageCause.VOID) {
+            message = p.getCustomName() + " magically fell into the void";
+        }
+        if(cause == EntityDamageEvent.DamageCause.FALL) {
+            message = p.getCustomName() + " fell off a cliff";
+        }
+        if(cause == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
+            message = p.getCustomName() + " was squashed by a falling block";
+        }
+        if(cause == EntityDamageEvent.DamageCause.FIRE || cause == EntityDamageEvent.DamageCause.FIRE_TICK || cause == EntityDamageEvent.DamageCause.HOT_FLOOR || cause == EntityDamageEvent.DamageCause.LAVA) {
+            message = p.getCustomName() + " burned to death";
+        }
+        if(cause == EntityDamageEvent.DamageCause.LIGHTNING) {
+            message = p.getCustomName() + " was struck by lightning";
+        }
+        if(cause == EntityDamageEvent.DamageCause.MAGIC) {
+            message = p.getCustomName() + " was killed by magic";
+        }
+        if(cause == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
+            message = p.getCustomName() + " failed flying school";
+        }
+        if(cause == EntityDamageEvent.DamageCause.MELTING) {
+            message = p.getCustomName() + " melted?";
+        }
+        if(cause == EntityDamageEvent.DamageCause.POISON) {
+            message = p.getCustomName() + " was poisoned";
+        }
+        if(cause == EntityDamageEvent.DamageCause.PROJECTILE) {
+            message = p.getCustomName() + " was slain by a rogue projectile";
+        }
+        if(cause == EntityDamageEvent.DamageCause.STARVATION) {
+            message = p.getCustomName() + " starved to death";
+        }
+        if(cause == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            message = p.getCustomName() + " suffocated in a wall";
+        }
+        if(cause == EntityDamageEvent.DamageCause.SUICIDE) {
+            message = p.getCustomName() + " commited suicide";
+        }
+        if(cause == EntityDamageEvent.DamageCause.THORNS) {
+            message = p.getCustomName() + " was pricked to death";
+        }
+
+        return message;
+    }
+    
     /**
      * Occurs when an entity is damaged by another entity. If a player hurts another entity before the game has begun,
      * the event will be cancelled so no damage is dealt
@@ -98,5 +162,22 @@ public class EventManager implements Listener {
             player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
         }
     }
+
+    @EventHandler
+    public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
+        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING) {
+            UHCPlayer player = UHCManager.getUHCPlayerFromPlayer(event.getPlayer());
+            event.getRecipients().removeIf(p -> !UHCManager.getUHCPlayerFromPlayer(p).getTeam().equals(player.getTeam()));
+        }
+    }
+
+    /*
+    @EventHandler
+    public void onChunkUnloadEvent(ChunkUnloadEvent event) {
+        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.LOBBY) {
+            event.setCancelled(true);
+        }
+    }
+    */
 
 }

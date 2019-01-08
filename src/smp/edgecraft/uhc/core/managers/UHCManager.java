@@ -1,18 +1,21 @@
 package smp.edgecraft.uhc.core.managers;
 
 import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.UHCCore;
 import smp.edgecraft.uhc.core.discord.UHCBot;
+import smp.edgecraft.uhc.core.events.UHCStartEvent;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 import smp.edgecraft.uhc.core.util.Countdown;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -43,22 +46,22 @@ public class UHCManager {
      */
     public static World WORLD_END;
 
+    public static List<Location> SPAWNS = new ArrayList<>();
+
     /**
      * All of the online players
      */
-    public static ArrayList<UHCPlayer> PLAYERS;
+    public static ArrayList<UHCPlayer> PLAYERS = new ArrayList<>();
     /**
      * All of the active teams
      */
-    public static ArrayList<UHCTeam> TEAMS;
+    public static ArrayList<UHCTeam> TEAMS = new ArrayList<>();
 
     /**
      * Called when the plugin is first enabled.
      */
     public static void onEnable() {
         prepareWorld();
-        PLAYERS = new ArrayList<>();
-        TEAMS = new ArrayList<>();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             preparePlayer(player);
@@ -117,6 +120,7 @@ public class UHCManager {
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         WORLD_OVERWORLD.setTime(0); // Change the time
         WORLD_OVERWORLD.setGameRule(GameRule.NATURAL_REGENERATION, false);
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 
         UHCCore.instance.getLogger().info("Building the lobby!");
 
@@ -152,6 +156,17 @@ public class UHCManager {
         // Make sure we don't prepare the world again
         WORLD_OVERWORLD.setMetadata("prepared", new FixedMetadataValue(UHCCore.instance, true));
         UHCCore.instance.getLogger().info("Prepared the world!");
+
+        for (int i = 1; i <= 8; i++) {
+            Location location = CONFIG.getLocation("spawns." + i, WORLD_OVERWORLD);
+            Biome biome = WORLD_OVERWORLD.getBiome(location.getBlockX(), location.getBlockZ());
+            if (biome == Biome.COLD_OCEAN || biome == Biome.DEEP_COLD_OCEAN || biome == Biome.DEEP_FROZEN_OCEAN || biome == Biome.DEEP_LUKEWARM_OCEAN || biome == Biome.DEEP_OCEAN || biome == Biome.DEEP_WARM_OCEAN || biome == Biome.WARM_OCEAN || biome == Biome.OCEAN)
+                continue;
+            SPAWNS.add(location);
+        }
+
+        UHCCore.instance.getLogger().info(String.format("%s valid spawns!", SPAWNS.size()));
+
     }
 
     /**
@@ -165,9 +180,15 @@ public class UHCManager {
             int currentTeamOrdinal = 0;
 
             // Initialise the hashmap
-            for (UHCTeam team : UHCTeam.values())
+            for (int teamOrdinal = 0; playersPerTeam.size() < SPAWNS.size() && teamOrdinal < UHCTeam.values().length; teamOrdinal++) {
+                UHCTeam team = UHCTeam.values()[teamOrdinal];
                 if (team != UHCTeam.UNSET && team != UHCTeam.SPECTATOR)
                     playersPerTeam.put(team, 0);
+            }
+            for (UHCTeam team : UHCTeam.values()) {
+                if (team != UHCTeam.UNSET && team != UHCTeam.SPECTATOR)
+                    playersPerTeam.put(team, 0);
+            }
 
             // Setup the players
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -264,12 +285,12 @@ public class UHCManager {
         for (UHCTeam team : TEAMS) {
             if (team == UHCTeam.SPECTATOR)
                 continue;
-            int index = random.nextInt(8) + 1;
+            int index = random.nextInt(SPAWNS.size()) + 1;
             while (chosenIndicies.contains(index))
-                index = random.nextInt(8) + 1;
+                index = random.nextInt(SPAWNS.size()) + 1;
             Location location = CONFIG.getLocation("spawns." + index, WORLD_OVERWORLD);
             location.setY(WORLD_OVERWORLD.getHighestBlockYAt(location) + 3);
-            WORLD_OVERWORLD.getChunkAt(location).load();
+            WORLD_OVERWORLD.loadChunk(WORLD_OVERWORLD.getChunkAt(location));
             location.setPitch(90F);
             team.getPlayers().forEach(player -> player.getPlayer().teleport(location));
         }
@@ -303,6 +324,7 @@ public class UHCManager {
         countdown.start();
 
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true); // Set the daylight cycle to true
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_MOB_SPAWNING, true);
         PLAYERS.forEach(player -> {
             if (player.getTeam() != UHCTeam.SPECTATOR) {
                 player.getPlayer().setGameMode(GameMode.SURVIVAL); // Update the gamemodes
@@ -310,9 +332,6 @@ public class UHCManager {
             } else {
                 player.getPlayer().setGameMode(GameMode.SPECTATOR);
             }
-        });
-        WORLD_OVERWORLD.getPlayers().forEach(player -> {
-
         });
         GAME_STATUS = GameStatus.RUNNING;
 
@@ -322,6 +341,8 @@ public class UHCManager {
         WORLD_END.getWorldBorder().setSize(CONFIG.<Integer>get("worldborder.shrink.size"), CONFIG.<Integer>get("worldborder.shrink.duration"));
 
         UHCBot.movePlayersInVC(); // Move the players to the correct voice chat
+
+        Bukkit.getServer().getPluginManager().callEvent(new UHCStartEvent());
     }
 
     /**
@@ -369,6 +390,13 @@ public class UHCManager {
         announce(ChatColor.RED + e.toString());
         for (StackTraceElement element : e.getStackTrace())
             announce(ChatColor.RED + element.toString());
+    }
+
+    public static UHCPlayer getUHCPlayerFromPlayer(Player player) {
+        for (UHCPlayer uhcPlayer : PLAYERS)
+            if (uhcPlayer.getPlayer().equals(player))
+                return uhcPlayer;
+        return null;
     }
 
     /**

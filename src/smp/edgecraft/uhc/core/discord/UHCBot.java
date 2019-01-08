@@ -183,6 +183,7 @@ public class UHCBot extends ListenerAdapter {
                         player.sendMessage(ChatColor.GREEN + "Sucessfully linked discord user (" + event.getAuthor().getName() + ") with your Minecraft account!"); // Notify the player
                         event.getAuthor().openPrivateChannel().queue(channel -> channel.sendMessage(event.getAuthor().getAsMention() + " you have sucessfully linked your Minecraft account (" + player.getName() + ") with your discord account!").queue()); // Privately message the user on discord
                         linkData.remove(event.getMessage().getContentDisplay().substring(6)); // Remove the link data
+                        event.getMessage().delete();
                         break;
                     }
                 }

@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="JDA-3.7.1_385-withDependencies" level="project" />
     <orderEntry type="library" name="spigot-1.13.1" level="project" />
+    <orderEntry type="library" name="WorldBorder" level="project" />
   </component>
 </module>

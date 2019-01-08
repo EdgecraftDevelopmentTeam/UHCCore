@@ -4,11 +4,20 @@ import net.dv8tion.jda.core.entities.Member;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static smp.edgecraft.uhc.core.teams.UHCTeam.SPECTATOR;
 
 /**
  * Represents a player who is playing in the UHC
  */
 public class UHCPlayer {
+
+    public static List<UHCPlayer> players = new ArrayList<>();
+
     /**
      * The instance of the player.
      *
@@ -31,7 +40,7 @@ public class UHCPlayer {
      */
     public UHCPlayer(Player player) {
         this.player = player;
-        this.team = UHCTeam.UNSET.addPlayer(this);
+        players.add(this);
     }
 
     /**
@@ -68,10 +77,28 @@ public class UHCPlayer {
      * @return The updated player
      */
     public UHCPlayer setTeam(UHCTeam team) {
-        this.team.removePlayer(this);
-        team.addPlayer(this);
+        if(this.team != null) this.team.removePlayer(this);
+        if(team != null) team.addPlayer(this);
         this.team = team;
         return this;
+    }
+
+    public boolean hasTeam(){
+        return team != null;
+    }
+
+    public static UHCPlayer get(Player p){
+        return players.stream().filter(x -> x.getPlayer() == p).findFirst().orElse(null);
+    }
+
+    public static boolean hasUHCPlayer(Player p){
+        return get(p) != null;
+    }
+
+    public void assertTeam(){
+        List<UHCTeam> l = UHCTeam.teams.stream().filter(x -> x!=SPECTATOR).filter(x -> x.size() < Math.ceil(players.size() / UHCTeam.teams.size())).collect(Collectors.toList());
+        Collections.shuffle(l);
+        setTeam(l.get(0));
     }
 
     /**

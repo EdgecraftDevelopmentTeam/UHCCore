@@ -43,27 +43,6 @@ public class UHCBot extends ListenerAdapter {
      */
     public static VoiceChannel mainChannel;
     /**
-     * The instance of the blue voice channel
-     */
-    public static VoiceChannel blueChannel;
-    /**
-     * The instance of the red voice channel
-     */
-    public static VoiceChannel redChannel;
-    /**
-     * The instance of the yellow voice channel
-     */
-    public static VoiceChannel yellowChannel;
-    /**
-     * The instance of the green voice channel
-     */
-    public static VoiceChannel greenChannel;
-    /**
-     * The instance of the pink voice channel
-     */
-    public static VoiceChannel pinkChannel;
-
-    /**
      * All of the randomly generated link codes and the players they were sent to
      */
     private static HashMap<String, Player> linkData = new HashMap<>();
@@ -74,21 +53,16 @@ public class UHCBot extends ListenerAdapter {
     public static void onEnable() {
         try {
             // Create the discord bot
-            jda = new JDABuilder(AccountType.BOT).setToken(UHCManager.CONFIG.get("discord.token")).addEventListener(new UHCBot()).buildBlocking();
+            jda = new JDABuilder(AccountType.BOT).setToken(UHCManager.CONFIG.getString("discord token")).addEventListener(new UHCBot()).buildBlocking();
             // Get the server
-            guild = jda.getGuildById(String.valueOf(UHCManager.CONFIG.<Long>get("discord.guild")));
+            guild = jda.getGuildById(String.valueOf(UHCManager.CONFIG.getLong("discord guild")));
             guildController = guild.getController();
             // Set the "playing" text
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.of(Game.GameType.DEFAULT, "UUHC"));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.of(Game.GameType.DEFAULT, UHCManager.CONFIG.getString("discord playing")));
             jda.getPresence().setStatus(OnlineStatus.ONLINE);
             jda.setAutoReconnect(true);
             // Initialise voice channel references
-            mainChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.main"));
-            blueChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.blue"));
-            redChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.red"));
-            yellowChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.yellow"));
-            greenChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.green"));
-            pinkChannel = guild.getVoiceChannelById(UHCManager.CONFIG.<Long>get("discord.vcs.pink"));
+            mainChannel = guild.getVoiceChannelById(UHCManager.CONFIG.getLong("discord mainvc"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,28 +80,7 @@ public class UHCBot extends ListenerAdapter {
      * Move all of the online players who have discord linked to the appropriate channel for their team
      */
     public static void movePlayersInVC() {
-        for (UHCPlayer player : UHCManager.PLAYERS) {
-            // Is the player linked with discord and are they on the main voice channel?
-            if (player.getDiscordMember() != null && mainChannel.getMembers().contains(player.getDiscordMember())) {
-                switch (player.getTeam()) {
-                    case BLUE:
-                        guildController.moveVoiceMember(player.getDiscordMember(), blueChannel).queue();
-                        break;
-                    case RED:
-                        guildController.moveVoiceMember(player.getDiscordMember(), redChannel).queue();
-                        break;
-                    case YELLOW:
-                        guildController.moveVoiceMember(player.getDiscordMember(), yellowChannel).queue();
-                        break;
-                    case GREEN:
-                        guildController.moveVoiceMember(player.getDiscordMember(), greenChannel).queue();
-                        break;
-                    case PINK:
-                        guildController.moveVoiceMember(player.getDiscordMember(), pinkChannel).queue();
-                        break;
-                }
-            }
-        }
+        UHCPlayer.players.stream().filter(x -> x.getDiscordMember() != null && mainChannel.getMembers().contains(x.getDiscordMember())).forEach(x -> guildController.moveVoiceMember(x.getDiscordMember(), guild.getVoiceChannelById(x.getTeam().getVC())));
     }
 
     /**
@@ -149,11 +102,9 @@ public class UHCBot extends ListenerAdapter {
      * @param player The player to link
      */
     public static void link(Player player) {
-        for (UHCPlayer player1 : UHCManager.PLAYERS) {
-            if (player1.getPlayer().equals(player) && player1.getDiscordMember() != null) {
-                player.sendMessage(ChatColor.RED + "A discord account (" + player1.getDiscordMember().getUser().getName() + ") is already linked with this Minecraft account");
-                return;
-            }
+        UHCPlayer p = UHCPlayer.get(player);
+        if (p.getDiscordMember() != null) {
+            player.sendMessage(ChatColor.RED + "A discord account (" + p.getDiscordMember().getUser().getName() + ") is already linked with this Minecraft account");
         }
         if (linkData.containsValue(player)) {
             player.sendMessage(ChatColor.RED + "You have already generated a link command!");
@@ -176,18 +127,14 @@ public class UHCBot extends ListenerAdapter {
         if (event.getMessage().getContentDisplay().startsWith("!link ")) { // Checks if the user typed !link in discord
             if (linkData.containsKey(event.getMessage().getContentDisplay().substring(6))) { // Checks if there is a player linked to the data provided
                 Player player = linkData.get(event.getMessage().getContentDisplay().substring(6)); // Get the player linked to the data provided
-                for (UHCPlayer player1 : UHCManager.PLAYERS) {
-                    if (player1.getPlayer().equals(player)) {
-                        UHCManager.CONFIG.set("players." + player.getUniqueId().toString() + ".discord", event.getAuthor().getId()); // Update the config
-                        player1.link(event.getMember()); // Link the account
-                        player.sendMessage(ChatColor.GREEN + "Sucessfully linked discord user (" + event.getAuthor().getName() + ") with your Minecraft account!"); // Notify the player
-                        event.getAuthor().openPrivateChannel().queue(channel -> channel.sendMessage(event.getAuthor().getAsMention() + " you have sucessfully linked your Minecraft account (" + player.getName() + ") with your discord account!").queue()); // Privately message the user on discord
-                        linkData.remove(event.getMessage().getContentDisplay().substring(6)); // Remove the link data
-                        event.getMessage().delete();
-                        break;
-                    }
-                }
+                UHCManager.CONFIG.set("players " + player.getUniqueId().toString() + " discord", event.getAuthor().getId()); // Update the config
+                UHCPlayer.get(player).link(event.getMember()); // Link the account
+                player.sendMessage(ChatColor.GREEN + "Sucessfully linked discord user (" + event.getAuthor().getName() + ") with your Minecraft account!"); // Notify the player
+                event.getAuthor().openPrivateChannel().queue(channel -> channel.sendMessage(event.getAuthor().getAsMention() + " you have sucessfully linked your Minecraft account (" + player.getName() + ") with your discord account!").queue()); // Privately message the user on discord
+                linkData.remove(event.getMessage().getContentDisplay().substring(6)); // Remove the link data
+                event.getMessage().delete();
             }
         }
     }
 }
+

@@ -21,7 +21,7 @@ public class UHCCore extends JavaPlugin {
         instance = this;
         this.getCommand("uhc").setExecutor(CommandManager.INSTANCE); // Register the uhc command
         this.getServer().getPluginManager().registerEvents(new EventManager(), this); // Register our event handler
-        UHCManager.CONFIG.getConfig(); // Create the config
+        UHCManager.loadConfig();
         UHCBot.onEnable(); // Enable the discord bot
         UHCManager.onEnable(); // Enable the UHC Manager
     }

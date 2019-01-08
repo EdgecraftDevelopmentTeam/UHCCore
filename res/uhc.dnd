@@ -1,0 +1,49 @@
+worlds
+  overworld
+    name world
+    spawn 0,175,0,90,0
+  <
+  nether
+    name world_nether
+    spawn 0.5,64,0.5
+  <
+  end
+    name world_the_end
+    spawn 0.5,64,0.5
+  <
+<
+worldborder
+  size 10000
+  shrink
+    duration 72000
+    size 100
+  <
+<
+lobby
+  width 50
+  depth 50
+  height 3
+<
+spawns
+  1 2500.5,64,0,90,0
+  2 2500.5,64,2500.5,90,0
+  3 0.5,64,2500.5,90,0
+  4 -2500.5,64,2500.5
+  5 -2500.5,64,0.5
+  6 -2500.5,64,-2500.5
+  7 0.5,64,-2500.5
+  8 2500.5,64,-2500.5
+<
+teams
+  red
+    name &c&lRed
+    colour &c
+    vc 0
+  <
+<
+discord
+  playing UHC yeet
+  token DISCORD_BOT_TOKEN
+  guild SERVER_GUILD_ID
+  mainvc MAIN_VC_ID
+<

@@ -12,17 +12,22 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import smp.edgecraft.uhc.core.discord.UHCBot;
+import smp.edgecraft.uhc.core.managers.UHCManager.GameStatus;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static smp.edgecraft.uhc.core.teams.UHCTeam.SPECTATOR;
 
 /**
  * Handles all of the events that the UHC uses
@@ -39,31 +44,31 @@ public class EventManager implements Listener {
             Player player = (Player) event.getEntity();
             player.setGameMode(GameMode.SPECTATOR);
             UHCManager.announce(deathMessage(player, event.getCause()));
-            List<UHCPlayer> remainingPlayers = new ArrayList<>();
-            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
-                if (uhcPlayer.getPlayer().equals(player)) {
-                    uhcPlayer.setTeam(UHCTeam.SPECTATOR);
-                    if (uhcPlayer.getDiscordMember() != null) {
-                        UHCBot.movePlayerToMainVC(uhcPlayer);
-                    }
-                } else if (uhcPlayer.getTeam() != UHCTeam.SPECTATOR && uhcPlayer.getTeam() != UHCTeam.UNSET)
-                    remainingPlayers.add(uhcPlayer);
+            UHCPlayer p = UHCPlayer.get(player);
+            p.setTeam(SPECTATOR);
+            if (p.getDiscordMember() != null) {
+                UHCBot.movePlayerToMainVC(p);
             }
+            checkForEnd();
+        }
+    }
 
-            if (remainingPlayers.size() == 1) { // If there is now only one alive player left
-                UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
-            } else if (remainingPlayers.size() > 0) { // Check if there is only one team left
-                UHCTeam team = remainingPlayers.get(0).getTeam(); // One of the teams left
-                boolean over = true;
-                for (UHCPlayer uhcPlayer : remainingPlayers) {
-                    if (uhcPlayer.getTeam() != team) { // If a player is on a different team
-                        over = false; // The game is not yet over
-                        break;
-                    }
+    public void checkForEnd(){
+        List<UHCPlayer> remainingPlayers = new ArrayList<>();
+        remainingPlayers.addAll(UHCPlayer.players.stream().filter(x -> x.hasTeam() && x.getTeam() != SPECTATOR).collect(Collectors.toList()));
+        if (remainingPlayers.size() == 1) { // If there is now only one alive player left
+            UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
+        } else if (remainingPlayers.size() > 0) { // Check if there is only one team left
+            UHCTeam team = remainingPlayers.get(0).getTeam(); // One of the teams left
+            boolean over = true;
+            for (UHCPlayer uhcPlayer : remainingPlayers) {
+                if (uhcPlayer.getTeam() != team) { // If a player is on a different team
+                    over = false; // The game is not yet over
+                    break;
                 }
-                if (over)
-                    UHCManager.win(team);
             }
+            if (over)
+                UHCManager.win(team);
         }
     }
 
@@ -148,29 +153,39 @@ public class EventManager implements Listener {
      */
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        UHCPlayer player = new UHCPlayer(event.getPlayer());
+        if (UHCManager.CONFIG.exists("players " + player.getPlayer().getUniqueId().toString() + " discord")) {
+            player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.getLong("players " + player.getPlayer().getUniqueId().toString() + " discord")));
+        }
         if (UHCManager.GAME_STATUS != UHCManager.GameStatus.RUNNING) {
             event.getPlayer().teleport(UHCManager.WORLD_OVERWORLD.getSpawnLocation());
             event.getPlayer().setGameMode(GameMode.ADVENTURE);
             event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 99999, 255, true, false));
-        } else event.getPlayer().setGameMode(GameMode.SURVIVAL);
-        UHCPlayer player = new UHCPlayer(event.getPlayer());
-        UHCManager.PLAYERS.add(player);
+            if (UHCManager.CONFIG.exists("players " + player.getPlayer().getUniqueId().toString() + " team")) {
+                UHCTeam team = UHCTeam.get(UHCManager.CONFIG.getString("players " + player.getPlayer().getUniqueId().toString() + " team"));
+                player.setTeam(team);
+            }
+        } else {
+            player.setTeam(SPECTATOR);
+            player.getPlayer().setGameMode(GameMode.SPECTATOR);
+            player.getPlayer().teleport(UHCManager.WORLD_OVERWORLD.getSpawnLocation());
+        }
+    }
 
-        if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".team")) {
-            UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".team"));
-            player.setTeam(team);
-        }
-        if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".discord")) {
-            player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
-        }
+    @EventHandler
+    public void onPlayerLeaveEvent(PlayerQuitEvent event){
+        UHCPlayer p = UHCPlayer.get(event.getPlayer());
+        p.setTeam(null);
+        UHCPlayer.players.remove(p);
+        checkForEnd();
     }
 
     @EventHandler
     public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
         if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && !event.getMessage().startsWith("*")) {
-            UHCPlayer player = UHCManager.getUHCPlayerFromPlayer(event.getPlayer());
-            Bukkit.getOnlinePlayers().stream().filter(x -> UHCManager.getUHCPlayerFromPlayer(x).getTeam().equals(player.getTeam())).forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.GREEN + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
+            UHCPlayer player = UHCPlayer.get(event.getPlayer());
+            Bukkit.getOnlinePlayers().stream().filter(x -> UHCPlayer.get(x).getTeam().equals(player.getTeam())).forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.GREEN + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
         } else {
             Bukkit.getOnlinePlayers().forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.DARK_GRAY + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
         }

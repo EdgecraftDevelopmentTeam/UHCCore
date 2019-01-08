@@ -1,36 +1,51 @@
 package smp.edgecraft.uhc.core.teams;
 
 import org.bukkit.ChatColor;
-import smp.edgecraft.uhc.core.managers.SettingsManager;
 import smp.edgecraft.uhc.core.managers.UHCManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import static smp.edgecraft.uhc.core.managers.UHCManager.CONFIG;
 
 /**
  * Represents a team playing the UHC. Each team stores an instance of all the players in the team
  */
-public enum UHCTeam {
-    UNSET(ChatColor.GRAY), // The default team of every player
-    BLUE(ChatColor.BLUE),
-    RED(ChatColor.RED),
-    YELLOW(ChatColor.YELLOW),
-    GREEN(ChatColor.GREEN),
-    PINK(ChatColor.LIGHT_PURPLE),
-    SPECTATOR(ChatColor.DARK_GRAY);
+public class UHCTeam {
+
+    public static List<UHCTeam> teams = new ArrayList<>();
+
+    public static UHCTeam SPECTATOR;
 
     /**
      * The list of all the players on the team
      */
     private List<UHCPlayer> players;
-    private ChatColor teamColor;
+    private String id;
+    private ChatColor colour;
+    private String name;
+    private long vc;
 
-    /**
-     * Represents a team playing the UHC.
-     */
-    UHCTeam(ChatColor teamColor) {
-        this.teamColor = teamColor;
+    UHCTeam(String id) {
+        this.id = id;
+        this.name = CONFIG.getString("teams " + id + " name");
+        this.colour = ChatColor.getByChar(CONFIG.getString("teams " + id + " colour").replace("&", ""));
+        this.vc = CONFIG.getLong("teams " + id + " vc");
         this.players = new ArrayList<>();
+    }
+
+    public long getVC() {
+        return vc;
+    }
+
+    public static UHCTeam get(String name){
+        return teams.stream().filter(x -> x.id.equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public static boolean exists(String name){
+        return  get(name) != null || name.equals("null");
     }
 
     /**
@@ -56,11 +71,10 @@ public enum UHCTeam {
      * @return The updated team
      */
     public UHCTeam addPlayer(UHCPlayer player) {
-        if (UNSET.getPlayers().contains(player))
-            UNSET.removePlayer(player);
-        UHCManager.CONFIG.set("players." + player.getPlayer().getUniqueId().toString() + ".team", this.name()); // Update the config
-        player.getPlayer().setDisplayName(this.teamColor + player.getPlayer().getName() + ChatColor.RESET);
-        player.getPlayer().setPlayerListName(this.teamColor + player.getPlayer().getName() + ChatColor.RESET);
+        teams.stream().filter(x -> x!=this).forEach(x -> x.removePlayer(player));
+        CONFIG.set("players " + player.getPlayer().getUniqueId().toString() + " team", this.id); // Update the config
+        player.getPlayer().setDisplayName(this.colour + player.getPlayer().getName() + ChatColor.RESET);
+        player.getPlayer().setPlayerListName(this.colour + player.getPlayer().getName() + ChatColor.RESET);
         this.players.add(player);
         return this;
     }
@@ -72,25 +86,30 @@ public enum UHCTeam {
      * @return The updated team
      */
     public UHCTeam removePlayer(UHCPlayer player) {
-        if (this.players.contains(player)) {
-            if (this != UNSET)
-                UNSET.addPlayer(player);
+        if (this.players.contains(player))
             this.players.remove(player);
-        }
         return this;
+    }
+
+    public String getDisplayName(){
+        return colour + "" + ChatColor.BOLD + id;
     }
 
     /**
      * @return whether the team is in use (i.e. there are players on the team)
      */
-    public boolean isActive() {
+    public boolean hasPlayers() {
         return this.players.size() > 0;
+    }
+
+    public int size(){
+        return this.players.size();
     }
 
     /**
      * @return the chat color of the team
      */
-    public ChatColor getTeamColor() {
-        return this.teamColor;
+    public ChatColor getColour() {
+        return this.colour;
     }
 }

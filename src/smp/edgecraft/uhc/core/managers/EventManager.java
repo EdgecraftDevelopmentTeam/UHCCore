@@ -23,6 +23,9 @@ import smp.edgecraft.uhc.core.teams.UHCTeam;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static smp.edgecraft.uhc.core.teams.UHCTeam.SPECTATOR;
 
 /**
  * Handles all of the events that the UHC uses
@@ -40,15 +43,12 @@ public class EventManager implements Listener {
             player.setGameMode(GameMode.SPECTATOR);
             UHCManager.announce(deathMessage(player, event.getCause()));
             List<UHCPlayer> remainingPlayers = new ArrayList<>();
-            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
-                if (uhcPlayer.getPlayer().equals(player)) {
-                    uhcPlayer.setTeam(UHCTeam.SPECTATOR);
-                    if (uhcPlayer.getDiscordMember() != null) {
-                        UHCBot.movePlayerToMainVC(uhcPlayer);
-                    }
-                } else if (uhcPlayer.getTeam() != UHCTeam.SPECTATOR && uhcPlayer.getTeam() != UHCTeam.UNSET)
-                    remainingPlayers.add(uhcPlayer);
+            UHCPlayer p = UHCPlayer.get(player);
+            p.setTeam(SPECTATOR);
+            if (p.getDiscordMember() != null) {
+                UHCBot.movePlayerToMainVC(p);
             }
+            remainingPlayers.addAll(UHCPlayer.players.stream().filter(x -> x.hasTeam() && x.getTeam() != SPECTATOR).collect(Collectors.toList()));
 
             if (remainingPlayers.size() == 1) { // If there is now only one alive player left
                 UHCManager.win(remainingPlayers.get(0).getTeam()); // They win
@@ -154,14 +154,13 @@ public class EventManager implements Listener {
             event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 99999, 255, true, false));
         } else event.getPlayer().setGameMode(GameMode.SURVIVAL);
         UHCPlayer player = new UHCPlayer(event.getPlayer());
-        UHCManager.PLAYERS.add(player);
 
-        if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".team")) {
-            UHCTeam team = UHCTeam.valueOf(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".team"));
+        if (UHCManager.CONFIG.exists("players " + player.getPlayer().getUniqueId().toString() + " team")) {
+            UHCTeam team = UHCTeam.get(UHCManager.CONFIG.getString("players " + player.getPlayer().getUniqueId().toString() + " team"));
             player.setTeam(team);
         }
-        if (UHCManager.CONFIG.contains("players." + player.getPlayer().getUniqueId().toString() + ".discord")) {
-            player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.get("players." + player.getPlayer().getUniqueId().toString() + ".discord")));
+        if (UHCManager.CONFIG.exists("players " + player.getPlayer().getUniqueId().toString() + " discord")) {
+            player.link(UHCBot.guild.getMemberById(UHCManager.CONFIG.getLong("players " + player.getPlayer().getUniqueId().toString() + " discord")));
         }
     }
 
@@ -169,8 +168,8 @@ public class EventManager implements Listener {
     public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
         if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && !event.getMessage().startsWith("*")) {
-            UHCPlayer player = UHCManager.getUHCPlayerFromPlayer(event.getPlayer());
-            Bukkit.getOnlinePlayers().stream().filter(x -> UHCManager.getUHCPlayerFromPlayer(x).getTeam().equals(player.getTeam())).forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.GREEN + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
+            UHCPlayer player = UHCPlayer.get(event.getPlayer());
+            Bukkit.getOnlinePlayers().stream().filter(x -> UHCPlayer.get(x).getTeam().equals(player.getTeam())).forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.GREEN + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
         } else {
             Bukkit.getOnlinePlayers().forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.DARK_GRAY + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
         }

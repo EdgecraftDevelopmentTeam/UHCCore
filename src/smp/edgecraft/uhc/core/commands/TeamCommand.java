@@ -1,8 +1,8 @@
 package smp.edgecraft.uhc.core.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import smp.edgecraft.uhc.core.managers.UHCManager;
 import smp.edgecraft.uhc.core.teams.UHCPlayer;
 import smp.edgecraft.uhc.core.teams.UHCTeam;
 
@@ -18,59 +18,25 @@ public class TeamCommand extends GameCommand {
         if (args.length == 2) {
             String teamName = args[0];
             String givenPlayerName = args[1];
-            UHCTeam givenTeam;
-            ChatColor teamColor;
-
-            teamName = teamName.toLowerCase();
-
-            switch (teamName) {
-                case "blue":
-                    givenTeam = UHCTeam.BLUE;
-                    teamColor = ChatColor.BLUE;
-                    break;
-                case "red":
-                    givenTeam = UHCTeam.RED;
-                    teamColor = ChatColor.RED;
-                    break;
-                case "yellow":
-                    givenTeam = UHCTeam.YELLOW;
-                    teamColor = ChatColor.YELLOW;
-                    break;
-                case "green":
-                    givenTeam = UHCTeam.GREEN;
-                    teamColor = ChatColor.GREEN;
-                    break;
-                case "pink":
-                    givenTeam = UHCTeam.PINK;
-                    teamColor = ChatColor.LIGHT_PURPLE;
-                    break;
-                default:
-                    player.sendMessage(ChatColor.RED + "Invalid team name");
-                    return;
+            if (Bukkit.getPlayer(givenPlayerName) == null) {
+                player.sendMessage(ChatColor.RED + "Invalid player name");
+                return;
             }
-
-            String displayTeamName = teamName.substring(0, 1).toUpperCase()
-                    + teamName.substring(1);
-
-            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
-                if (uhcPlayer.getPlayer().getName().equalsIgnoreCase(givenPlayerName)) {
-                    uhcPlayer.setTeam(givenTeam);
-                    uhcPlayer.getPlayer().sendMessage(ChatColor.YELLOW + "You joined the "
-                            + teamColor + displayTeamName + ChatColor.YELLOW + " team");
-
-                    player.sendMessage(ChatColor.YELLOW + "Successfully put "
-                            + uhcPlayer.getPlayer().getDisplayName() + ChatColor.YELLOW + " into the "
-                            + teamColor + displayTeamName + ChatColor.YELLOW + " team");
-                    return;
-                }
-
+            if (UHCTeam.exists(teamName.toLowerCase())) {
+                player.sendMessage(ChatColor.RED + "Invalid team name");
+                return;
             }
-            // If the provided player name is not found:
-            player.sendMessage(ChatColor.RED + "Invalid player name");
+            UHCPlayer p = UHCPlayer.get(Bukkit.getPlayer(givenPlayerName));
+            p.setTeam(UHCTeam.get(teamName.toLowerCase()));
+            if (p.getTeam() == null) {
+                p.getPlayer().sendMessage(ChatColor.YELLOW + "You left your team!");
+                player.sendMessage(ChatColor.YELLOW + "Successfully made " + p.getPlayer().getDisplayName() + " leave their team!");
+            } else {
+                p.getPlayer().sendMessage(ChatColor.YELLOW + "You joined " + p.getTeam().getDisplayName());
+                player.sendMessage(ChatColor.YELLOW + "Successfully put " + p.getPlayer().getDisplayName() + ChatColor.YELLOW + " into " + p.getTeam().getDisplayName());
+            }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
-            for (UHCPlayer uhcPlayer : UHCManager.PLAYERS) {
-                uhcPlayer.setTeam(UHCTeam.UNSET);
-            }
+            UHCPlayer.players.forEach(x -> x.setTeam(null));
             player.sendMessage(ChatColor.GREEN + "Reset teams!");
         }
     }

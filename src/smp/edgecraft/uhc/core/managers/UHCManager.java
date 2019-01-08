@@ -69,6 +69,9 @@ public class UHCManager {
     public static void onEnable() {
         prepareWorld();
 
+        UHCTeam.createSpectatorTeam();
+        CONFIG.getLevels("teams").forEach(UHCTeam::new);
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             preparePlayer(player);
         }

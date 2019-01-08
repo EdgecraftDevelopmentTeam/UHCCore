@@ -28,7 +28,14 @@ public class UHCTeam {
     private String name;
     private long vc;
 
-    UHCTeam(String id) {
+    private UHCTeam(){
+        this.id = "spectator";
+        this.name = "&7&lSpectator";
+        this.colour = ChatColor.GRAY;
+        this.players = new ArrayList<>();
+    }
+
+    public UHCTeam(String id) {
         this.id = id;
         this.name = CONFIG.getString("teams " + id + " name");
         this.colour = ChatColor.getByChar(CONFIG.getString("teams " + id + " colour").replace("&", ""));
@@ -38,6 +45,10 @@ public class UHCTeam {
 
     public long getVC() {
         return vc;
+    }
+
+    public static void createSpectatorTeam(){
+        SPECTATOR = new UHCTeam();
     }
 
     public static UHCTeam get(String name){
@@ -92,7 +103,7 @@ public class UHCTeam {
     }
 
     public String getDisplayName(){
-        return colour + "" + ChatColor.BOLD + id;
+        return ChatColor.translateAlternateColorCodes('&', name);
     }
 
     /**

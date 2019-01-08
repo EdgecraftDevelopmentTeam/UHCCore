@@ -1,5 +1,7 @@
 package smp.edgecraft.uhc.core.managers;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -69,58 +71,58 @@ public class EventManager implements Listener {
         String message = "";
 
         if(cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
-            message = p.getCustomName() + " blew up";
+            message = p.getDisplayName() + " blew up";
         }
         if(cause == EntityDamageEvent.DamageCause.WITHER) {
-            message = p.getCustomName() + " withered away";
+            message = p.getDisplayName() + " withered away";
         }
         if(cause == EntityDamageEvent.DamageCause.DROWNING) {
-            message = p.getCustomName() + " drowned";
+            message = p.getDisplayName() + " drowned";
         }
         if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK || cause == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) {
-            message = p.getCustomName() + " was slain";
+            message = p.getDisplayName() + " was slain";
         }
         if(cause == EntityDamageEvent.DamageCause.VOID) {
-            message = p.getCustomName() + " magically fell into the void";
+            message = p.getDisplayName() + " magically fell into the void";
         }
         if(cause == EntityDamageEvent.DamageCause.FALL) {
-            message = p.getCustomName() + " fell off a cliff";
+            message = p.getDisplayName() + " fell off a cliff";
         }
         if(cause == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
-            message = p.getCustomName() + " was squashed by a falling block";
+            message = p.getDisplayName() + " was squashed by a falling block";
         }
         if(cause == EntityDamageEvent.DamageCause.FIRE || cause == EntityDamageEvent.DamageCause.FIRE_TICK || cause == EntityDamageEvent.DamageCause.HOT_FLOOR || cause == EntityDamageEvent.DamageCause.LAVA) {
-            message = p.getCustomName() + " burned to death";
+            message = p.getDisplayName() + " burned to death";
         }
         if(cause == EntityDamageEvent.DamageCause.LIGHTNING) {
-            message = p.getCustomName() + " was struck by lightning";
+            message = p.getDisplayName() + " was struck by lightning";
         }
         if(cause == EntityDamageEvent.DamageCause.MAGIC) {
-            message = p.getCustomName() + " was killed by magic";
+            message = p.getDisplayName() + " was killed by magic";
         }
         if(cause == EntityDamageEvent.DamageCause.FLY_INTO_WALL) {
-            message = p.getCustomName() + " failed flying school";
+            message = p.getDisplayName() + " failed flying school";
         }
         if(cause == EntityDamageEvent.DamageCause.MELTING) {
-            message = p.getCustomName() + " melted?";
+            message = p.getDisplayName() + " melted?";
         }
         if(cause == EntityDamageEvent.DamageCause.POISON) {
-            message = p.getCustomName() + " was poisoned";
+            message = p.getDisplayName() + " was poisoned";
         }
         if(cause == EntityDamageEvent.DamageCause.PROJECTILE) {
-            message = p.getCustomName() + " was slain by a rogue projectile";
+            message = p.getDisplayName() + " was slain by a rogue projectile";
         }
         if(cause == EntityDamageEvent.DamageCause.STARVATION) {
-            message = p.getCustomName() + " starved to death";
+            message = p.getDisplayName() + " starved to death";
         }
         if(cause == EntityDamageEvent.DamageCause.SUFFOCATION) {
-            message = p.getCustomName() + " suffocated in a wall";
+            message = p.getDisplayName() + " suffocated in a wall";
         }
         if(cause == EntityDamageEvent.DamageCause.SUICIDE) {
-            message = p.getCustomName() + " commited suicide";
+            message = p.getDisplayName() + " commited suicide";
         }
         if(cause == EntityDamageEvent.DamageCause.THORNS) {
-            message = p.getCustomName() + " was pricked to death";
+            message = p.getDisplayName() + " was pricked to death";
         }
 
         return message;
@@ -165,9 +167,12 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
-        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING) {
+        event.setCancelled(true);
+        if (UHCManager.GAME_STATUS == UHCManager.GameStatus.RUNNING && !event.getMessage().startsWith("*")) {
             UHCPlayer player = UHCManager.getUHCPlayerFromPlayer(event.getPlayer());
-            event.getRecipients().removeIf(p -> !UHCManager.getUHCPlayerFromPlayer(p).getTeam().equals(player.getTeam()));
+            Bukkit.getOnlinePlayers().stream().filter(x -> UHCManager.getUHCPlayerFromPlayer(x).getTeam().equals(player.getTeam())).forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.GREEN + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
+        } else {
+            Bukkit.getOnlinePlayers().forEach(x -> x.sendMessage(event.getPlayer().getDisplayName() + ChatColor.DARK_GRAY + " " + ChatColor.BOLD + "»" + ChatColor.GRAY + " " + ChatColor.translateAlternateColorCodes('&', event.getMessage())));
         }
     }
 

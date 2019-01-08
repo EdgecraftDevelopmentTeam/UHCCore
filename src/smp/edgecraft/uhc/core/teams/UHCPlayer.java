@@ -1,8 +1,9 @@
 package smp.edgecraft.uhc.core.teams;
 
 import net.dv8tion.jda.core.entities.Member;
-import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents a player who is playing in the UHC

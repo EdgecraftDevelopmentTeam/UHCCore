@@ -300,7 +300,7 @@ public class UHCManager {
             if (player.getTeam() != UHCTeam.SPECTATOR) {
                 player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 255, true, false));
                 player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 99999, 255, true, false));
-                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, true, false));
+                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999, 255, true, false));
             }
         });
 
@@ -317,6 +317,7 @@ public class UHCManager {
                     if (player.getTeam() != UHCTeam.SPECTATOR) {
                         player.getPlayer().removePotionEffect(PotionEffectType.SLOW);
                         player.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+                        player.getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                     }
                 });
             }
@@ -325,10 +326,14 @@ public class UHCManager {
 
         WORLD_OVERWORLD.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true); // Set the daylight cycle to true
         WORLD_OVERWORLD.setGameRule(GameRule.DO_MOB_SPAWNING, true);
+        WORLD_OVERWORLD.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        WORLD_OVERWORLD.setStorm(false);
+        WORLD_OVERWORLD.setThundering(false);
         PLAYERS.forEach(player -> {
             if (player.getTeam() != UHCTeam.SPECTATOR) {
                 player.getPlayer().setGameMode(GameMode.SURVIVAL); // Update the gamemodes
                 player.getPlayer().removePotionEffect(PotionEffectType.SATURATION); // Remove the saturation effect
+                player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 255, true, false));
             } else {
                 player.getPlayer().setGameMode(GameMode.SPECTATOR);
             }
@@ -352,6 +357,7 @@ public class UHCManager {
      */
     public static void win(UHCTeam team) {
         announce(ChatColor.GOLD + "The " + ChatColor.BOLD + team.getTeamColor() + team.name().toLowerCase() + ChatColor.RESET + ChatColor.GOLD + " team wins!");
+        Bukkit.getOnlinePlayers().forEach(x -> x.playSound(x.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1));
         // Some win particle / sound?
         GAME_STATUS = GameStatus.FINISHED;
         team.getPlayers().forEach(player -> {

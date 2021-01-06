@@ -79,7 +79,7 @@ public class UHCBot extends ListenerAdapter {
             guild = jda.getGuildById(String.valueOf(UHCManager.CONFIG.<Long>get("discord.guild")));
             guildController = guild.getController();
             // Set the "playing" text
-            jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.of(Game.GameType.DEFAULT, "UUHC"));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.of(Game.GameType.DEFAULT, "UHC"));
             jda.getPresence().setStatus(OnlineStatus.ONLINE);
             jda.setAutoReconnect(true);
             // Initialise voice channel references
